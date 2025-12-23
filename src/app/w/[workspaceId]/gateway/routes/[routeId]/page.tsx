@@ -266,10 +266,6 @@ export default function RouteViewPage() {
                 ))}
               </select>
             </div>
-
-            <Link className="text-sm text-zinc-700 hover:underline" href={`/w/${params.workspaceId}/gateway/activities`}>
-              Ver activities
-            </Link>
           </div>
         </div>
 

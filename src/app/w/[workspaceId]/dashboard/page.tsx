@@ -327,9 +327,6 @@ export default function WorkspaceDashboardPage() {
               {timeframeLabel(timeframe)} · Success vs Error
             </div>
           </div>
-          <Link className="text-sm text-zinc-700 hover:underline" href={`/w/${params.workspaceId}/gateway/activities`}>
-            Ver activities
-          </Link>
         </div>
 
         {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Carregando…</div> : null}
