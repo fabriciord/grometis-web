@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { clearAccessToken, getAccessToken } from '@/lib/auth';
 
@@ -23,6 +23,16 @@ export default function WorkspaceLayout({
   const pathname = usePathname();
   const params = useParams<{ workspaceId: string }>();
   const token = useMemo(() => getAccessToken(), []);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const apiBaseUrlLabel = useMemo(() => {
+    const raw = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+    try {
+      return new URL(raw).host;
+    } catch {
+      return raw;
+    }
+  }, []);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -30,15 +40,13 @@ export default function WorkspaceLayout({
 
   const workspaceId = params.workspaceId;
 
-  if (!workspaceId) return null;
-
   const workspacesQuery = useQuery({
     queryKey: ['workspaces'],
     queryFn: async () => {
       const res = await apiFetch<{ workspaces: WorkspaceListItem[] }>('/workspaces', { token });
       return res.workspaces;
     },
-    enabled: !!token,
+    enabled: !!token && !!workspaceId,
   });
 
   const workspaceName =
@@ -56,23 +64,37 @@ export default function WorkspaceLayout({
     { label: 'Members', href: `/w/${workspaceId}/settings/members` },
   ];
 
+  if (!workspaceId) return null;
+
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <div className="flex min-h-screen">
-        <aside className="flex w-64 flex-col bg-zinc-950 px-4 py-5 text-zinc-100">
+        <aside
+          className={`${sidebarOpen ? 'flex' : 'hidden'} sticky top-0 h-screen w-64 shrink-0 flex-col overflow-y-auto bg-zinc-950 px-4 py-5 text-zinc-100`}
+        >
           <div>
             <Link
-              href="/select-workspace"
-              className="inline-flex rounded-md px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-zinc-900/60 hover:text-white"
+              href={`/w/${workspaceId}/dashboard`}
+              className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-900/60"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white">
+                G
+              </div>
+
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-white">GrOMEtiS</div>
+                <div className="truncate text-xs text-zinc-400">Gateway control plane</div>
+              </div>
+            </Link>
+
+            <Link
+              href="/workspace"
+              className="mt-3 inline-flex rounded-md px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-zinc-900/60 hover:text-white"
             >
               Trocar workspace
             </Link>
-            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-              GrOMEtiS Gateway
-            </div>
-            <div className="mt-1 truncate text-sm font-medium text-zinc-100">
-              Workspace: {workspaceName}
-            </div>
+            <div className="mt-3 truncate text-sm font-medium text-zinc-100">{workspaceName}</div>
+            <div className="mt-1 text-xs text-zinc-500">Workspace</div>
           </div>
 
           <nav className="mt-6 space-y-1">
@@ -122,16 +144,34 @@ export default function WorkspaceLayout({
 
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
-            <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-              <div className="min-w-0">
-                <div className="truncate text-sm font-medium text-zinc-900">{workspaceName}</div>
-                <div className="text-xs text-zinc-500">Control plane</div>
+            <div className="flex w-full items-center justify-between px-6 py-3">
+              <div className="min-w-0 flex items-center gap-3">
+                <button
+                  type="button"
+                  aria-label={sidebarOpen ? 'Fechar menu' : 'Abrir menu'}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  onClick={() => setSidebarOpen((v) => !v)}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                    <path
+                      d="M4 7h16M4 12h16M4 17h16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-zinc-900">{workspaceName}</div>
+                  <div className="text-xs text-zinc-500">Control plane</div>
+                </div>
               </div>
-              <div className="text-xs text-zinc-500">API: http://localhost:3001</div>
+              <div className="text-xs text-zinc-500">API: {apiBaseUrlLabel}</div>
             </div>
           </header>
 
-          <main className="mx-auto max-w-5xl px-6 py-6">{children}</main>
+          <main className="mx-auto max-w-7xl px-6 py-6">{children}</main>
         </div>
       </div>
     </div>

@@ -25,7 +25,7 @@ export default function LoginPage() {
     },
     onSuccess: (data) => {
       setAccessToken(data.accessToken);
-      router.push('/select-workspace');
+      router.push('/workspace');
     },
   });
 

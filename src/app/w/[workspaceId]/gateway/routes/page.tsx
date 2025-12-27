@@ -1,9 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -20,10 +21,22 @@ type RouteListItem = {
   createdAt: string;
 };
 
+type WorkspaceListItem = { id: string; name: string; role: 'viewer' | 'admin' | 'owner' };
+
+type PluginListItem = {
+  id: string;
+  isGlobal?: boolean;
+  routeId: string | null;
+  serviceId: string | null;
+  consumerId: string | null;
+};
+
 export default function RoutesPage() {
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
   const token = useMemo(() => getAccessToken(), []);
+  const queryClient = useQueryClient();
+  const [routeToDelete, setRouteToDelete] = useState<{ id: string; label: string } | null>(null);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -41,8 +54,76 @@ export default function RoutesPage() {
     enabled: !!token,
   });
 
+  const workspacesQuery = useQuery({
+    queryKey: ['workspaces'],
+    queryFn: async () => {
+      const res = await apiFetch<{ workspaces: WorkspaceListItem[] }>('/workspaces', { token });
+      return res.workspaces;
+    },
+    enabled: !!token,
+  });
+
+  const pluginsQuery = useQuery({
+    queryKey: ['plugins', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ plugins: PluginListItem[] }>(
+        `/workspaces/${params.workspaceId}/plugins`,
+        { token },
+      );
+      return res.plugins;
+    },
+    enabled: !!token,
+  });
+
+  const deleteRouteMutation = useMutation({
+    mutationFn: async (routeId: string) => {
+      return apiFetch<{ ok: true }>(`/workspaces/${params.workspaceId}/routes/${routeId}`, {
+        method: 'DELETE',
+        token,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['routes', params.workspaceId] });
+      await queryClient.invalidateQueries({ queryKey: ['plugins', params.workspaceId] });
+    },
+  });
+
+  const role =
+    workspacesQuery.data?.find((w) => w.id === params.workspaceId)?.role ?? 'viewer';
+  const canManage = role === 'admin' || role === 'owner';
+
+  const pluginCountByRoute = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of pluginsQuery.data ?? []) {
+      if (p.isGlobal) continue;
+      if (p.serviceId) continue;
+      if (p.consumerId) continue;
+      if (!p.routeId) continue;
+      map.set(p.routeId, (map.get(p.routeId) ?? 0) + 1);
+    }
+    return map;
+  }, [pluginsQuery.data]);
+
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={routeToDelete !== null}
+        title="Excluir route?"
+        description={
+          routeToDelete ? `Excluir a route "${routeToDelete.label}"? Essa ação não pode ser desfeita.` : undefined
+        }
+        tone="danger"
+        confirmLabel={deleteRouteMutation.isPending ? 'Excluindo…' : 'Excluir'}
+        cancelLabel="Cancelar"
+        busy={deleteRouteMutation.isPending}
+        onCancel={() => setRouteToDelete(null)}
+        onConfirm={() => {
+          if (!routeToDelete) return;
+          deleteRouteMutation.mutate(routeToDelete.id);
+          setRouteToDelete(null);
+        }}
+      />
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Routes</h1>
@@ -104,6 +185,31 @@ export default function RoutesPage() {
                       >
                         Edit
                       </Link>
+                      <button
+                        type="button"
+                        className="text-red-700 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={
+                          !canManage ||
+                          (pluginCountByRoute.get(r.id) ?? 0) > 0 ||
+                          deleteRouteMutation.isPending
+                        }
+                        title={
+                          !canManage
+                            ? 'Você não tem permissão para excluir routes.'
+                            : (pluginCountByRoute.get(r.id) ?? 0) > 0
+                              ? 'Remova os plugins da route antes de excluir.'
+                              : undefined
+                        }
+                        onClick={() => {
+                          if (!canManage) return;
+                          const pluginsCount = pluginCountByRoute.get(r.id) ?? 0;
+                          if (pluginsCount > 0) return;
+                          const label = r.name ?? r.paths.join(', ');
+                          setRouteToDelete({ id: r.id, label });
+                        }}
+                      >
+                        {deleteRouteMutation.isPending ? 'Deleting…' : 'Delete'}
+                      </button>
                     </div>
                   </td>
                 </tr>

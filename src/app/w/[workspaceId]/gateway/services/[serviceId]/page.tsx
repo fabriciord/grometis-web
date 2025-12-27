@@ -101,6 +101,12 @@ function statusClass(statusCode: number) {
   return 'bg-zinc-400';
 }
 
+function serviceEnabledBadge(enabled: boolean) {
+  return enabled
+    ? 'border-zinc-200 bg-zinc-100 text-zinc-900'
+    : 'border-zinc-200 bg-white text-zinc-600';
+}
+
 export default function ServiceViewPage() {
   const params = useParams<{ workspaceId: string; serviceId: string }>();
   const router = useRouter();
@@ -122,6 +128,7 @@ export default function ServiceViewPage() {
     },
     enabled: !!token,
   });
+
 
   const activitiesQuery = useQuery({
     queryKey: ['activities', params.workspaceId],
@@ -158,6 +165,7 @@ export default function ServiceViewPage() {
     },
     enabled: !!token,
   });
+
 
   const service = serviceQuery.data;
 
@@ -206,10 +214,28 @@ export default function ServiceViewPage() {
             <span className="text-zinc-900">{service?.name ?? '…'}</span>
           </div>
           <h1 className="mt-2 truncate text-3xl font-semibold text-zinc-900">{service?.name ?? '…'}</h1>
+
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {service ? (
+              <span
+                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${serviceEnabledBadge(
+                  service.enabled,
+                )}`}
+              >
+                {service.enabled ? 'Enabled' : 'Disabled'}
+              </span>
+            ) : null}
+            <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-xs text-zinc-600">
+              ID: {params.serviceId}
+            </span>
+          </div>
+
           {service ? (
             <div className="mt-2 text-sm text-zinc-600">
-              {service.protocol}://{service.host}:{service.port}
-              {service.path ? service.path : ''}
+              <span className="font-mono">
+                {service.protocol}://{service.host}:{service.port}
+                {service.path ? service.path : ''}
+              </span>
             </div>
           ) : (
             <div className="mt-2 text-sm text-zinc-600">Carregando…</div>
@@ -226,13 +252,15 @@ export default function ServiceViewPage() {
             </Link>
             <Link
               href={`/w/${params.workspaceId}/gateway/services/${params.serviceId}/edit`}
-              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
             >
               Edit Service
             </Link>
           </div>
           {service?.updatedAt ? (
-            <div className="text-xs text-zinc-500">Last Updated: {new Date(service.updatedAt).toLocaleString()}</div>
+            <div className="text-xs text-zinc-500">
+              Atualizado em: {new Date(service.updatedAt).toLocaleString()}
+            </div>
           ) : null}
         </div>
       </div>
@@ -241,6 +269,7 @@ export default function ServiceViewPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-sm font-medium text-zinc-900">Status Codes</div>
+            <div className="mt-1 text-xs text-zinc-500">Total no período: {statusCodes.total.toLocaleString()}</div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -302,7 +331,12 @@ export default function ServiceViewPage() {
       <div className="grid gap-3 lg:grid-cols-2">
         <div className="rounded-xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="text-sm font-medium text-zinc-900">Routes</div>
+            <div>
+              <div className="text-sm font-medium text-zinc-900">Routes</div>
+              <div className="mt-0.5 text-xs text-zinc-500">
+                {routesQuery.isLoading ? 'Carregando…' : `Total: ${(routesQuery.data ?? []).length.toLocaleString()}`}
+              </div>
+            </div>
             <Link
               className="text-sm text-blue-600 hover:underline"
               href={`/w/${params.workspaceId}/gateway/routes/new?serviceId=${params.serviceId}`}
@@ -320,7 +354,16 @@ export default function ServiceViewPage() {
             {routesQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
             {routesQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
             {!routesQuery.isLoading && !routesQuery.isError && routes.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-zinc-600">No Routes</div>
+              <div className="px-4 py-6 text-center">
+                <div className="text-sm font-medium text-zinc-900">Nenhuma rota ainda</div>
+                <div className="mt-1 text-sm text-zinc-600">Crie a primeira rota para começar a rotear tráfego.</div>
+                <Link
+                  href={`/w/${params.workspaceId}/gateway/routes/new?serviceId=${params.serviceId}`}
+                  className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Add Route
+                </Link>
+              </div>
             ) : null}
             {routes.map((r) => (
               <Link
@@ -329,11 +372,14 @@ export default function ServiceViewPage() {
                 className="grid grid-cols-2 items-center gap-3 px-4 py-3 hover:bg-zinc-50"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm text-zinc-900" title={r.name ?? r.id}>
+                  <div className="truncate text-sm font-medium text-zinc-900" title={r.name ?? r.id}>
                     {r.name ?? r.id}
                   </div>
+                  <div className="mt-0.5 truncate text-xs text-zinc-500">{r.id}</div>
                 </div>
-                <div className="text-right text-sm text-zinc-700">[{r.protocols.map((p) => `\"${p}\"`).join(', ')}]</div>
+                <div className="text-right">
+                  <div className="text-sm text-zinc-700">{r.protocols.join(', ')}</div>
+                </div>
               </Link>
             ))}
           </div>
@@ -341,7 +387,12 @@ export default function ServiceViewPage() {
 
         <div className="rounded-xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="text-sm font-medium text-zinc-900">Plugins</div>
+            <div>
+              <div className="text-sm font-medium text-zinc-900">Plugins</div>
+              <div className="mt-0.5 text-xs text-zinc-500">
+                {pluginsQuery.isLoading ? 'Carregando…' : `Total: ${(pluginsQuery.data ?? []).length.toLocaleString()}`}
+              </div>
+            </div>
             <Link
               className="text-sm text-blue-600 hover:underline"
               href={`/w/${params.workspaceId}/gateway/plugins/new?serviceId=${params.serviceId}`}
@@ -356,7 +407,16 @@ export default function ServiceViewPage() {
             {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
             {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
             {!pluginsQuery.isLoading && !pluginsQuery.isError && plugins.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-zinc-600">No Plugins</div>
+              <div className="px-4 py-6 text-center">
+                <div className="text-sm font-medium text-zinc-900">Nenhum plugin no service</div>
+                <div className="mt-1 text-sm text-zinc-600">Adicione plugins para aplicar políticas e transformações.</div>
+                <Link
+                  href={`/w/${params.workspaceId}/gateway/plugins/new?serviceId=${params.serviceId}`}
+                  className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Add Plugin
+                </Link>
+              </div>
             ) : null}
             {plugins.map((p) => (
               <Link
@@ -366,8 +426,16 @@ export default function ServiceViewPage() {
                 title={`${p.name} (${p.id})`}
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm text-zinc-900">{p.name}</div>
+                  <div className="truncate text-sm font-medium text-zinc-900">{p.name}</div>
+                  <div className="mt-0.5 truncate text-xs text-zinc-500">{p.id}</div>
                 </div>
+                <span
+                  className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${
+                    p.enabled ? 'border-zinc-200 bg-zinc-100 text-zinc-900' : 'border-zinc-200 bg-white text-zinc-600'
+                  }`}
+                >
+                  {p.enabled ? 'Enabled' : 'Disabled'}
+                </span>
               </Link>
             ))}
           </div>

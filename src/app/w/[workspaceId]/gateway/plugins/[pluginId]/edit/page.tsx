@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -392,6 +393,7 @@ function splitCsv(value: string): string[] {
 }
 
 export default function PluginEditPage() {
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const params = useParams<{ workspaceId: string; pluginId: string }>();
   const router = useRouter();
   const token = useMemo(() => getAccessToken(), []);
@@ -536,6 +538,7 @@ function PluginEditForm({
   const [serviceId, setServiceId] = useState(plugin.serviceId ?? '');
   const [routeId, setRouteId] = useState(plugin.routeId ?? '');
   const [consumerId, setConsumerId] = useState(plugin.consumerId ?? '');
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const lastScopedTargetsRef = useRef<{ serviceId: string; routeId: string; consumerId: string }>({
     serviceId: plugin.serviceId ?? '',
@@ -600,6 +603,21 @@ function PluginEditForm({
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4">
+      <ConfirmDialog
+        open={isDeleteOpen}
+        title="Excluir plugin?"
+        description="Excluir este plugin? Essa ação não pode ser desfeita."
+        tone="danger"
+        confirmLabel={deletePluginMutation.isPending ? 'Excluindo…' : 'Excluir'}
+        cancelLabel="Cancelar"
+        busy={deletePluginMutation.isPending}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={() => {
+          deletePluginMutation.mutate();
+          setIsDeleteOpen(false);
+        }}
+      />
+
       <form
         className="grid gap-2 sm:grid-cols-2"
         onSubmit={(e) => {
@@ -774,7 +792,7 @@ function PluginEditForm({
             className="rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
             disabled={deletePluginMutation.isPending}
             onClick={() => {
-              if (confirm('Excluir este plugin?')) deletePluginMutation.mutate();
+              setIsDeleteOpen(true);
             }}
             type="button"
           >

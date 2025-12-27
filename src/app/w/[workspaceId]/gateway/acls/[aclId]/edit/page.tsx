@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -31,8 +32,8 @@ export default function AclEditPage() {
   const token = useMemo(() => getAccessToken(), []);
 
   const [draftGroup, setDraftGroup] = useState<string | null>(null);
-  const [draftConsumerId, setDraftConsumerId] = useState<string | null>(null);
   const [draftTags, setDraftTags] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -63,14 +64,13 @@ export default function AclEditPage() {
   });
 
   const group = draftGroup ?? aclQuery.data?.group ?? '';
-  const consumerId = draftConsumerId ?? aclQuery.data?.consumerId ?? '';
+  const consumerId = aclQuery.data?.consumerId ?? '';
   const tags = draftTags ?? (aclQuery.data?.tags?.join(', ') ?? '');
 
   const updateMutation = useMutation({
     mutationFn: async () => {
       const payload: Record<string, unknown> = {
         group,
-        consumerId,
         tags: tags.trim().length ? splitCsv(tags) : null,
       };
 
@@ -104,13 +104,32 @@ export default function AclEditPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={isDeleteOpen}
+        title="Deletar ACL?"
+        description="Deletar esta ACL? Essa ação não pode ser desfeita."
+        tone="danger"
+        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
+        cancelLabel="Cancelar"
+        busy={deleteMutation.isPending}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={() => {
+          deleteMutation.mutate();
+          setIsDeleteOpen(false);
+        }}
+      />
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit ACL</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize group/consumer/tags.</p>
+          <p className="mt-1 text-sm text-zinc-600">Atualize group/tags.</p>
         </div>
         <Link
-          href={`/w/${params.workspaceId}/gateway/acls/${params.aclId}`}
+          href={
+            aclQuery.data?.consumerId
+              ? `/w/${params.workspaceId}/gateway/consumers/${aclQuery.data.consumerId}`
+              : `/w/${params.workspaceId}/gateway/acls/${params.aclId}`
+          }
           className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
         >
           Back
@@ -147,9 +166,12 @@ export default function AclEditPage() {
               <select
                 className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
                 value={selectedConsumerId}
-                onChange={(e) => setDraftConsumerId(e.target.value)}
+                disabled
                 required
               >
+                {consumerId && !(consumersQuery.data ?? []).some((c) => c.id === consumerId) ? (
+                  <option value={consumerId}>{consumerId}</option>
+                ) : null}
                 {(consumersQuery.data ?? []).map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.username}
@@ -181,8 +203,7 @@ export default function AclEditPage() {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => {
-                  const ok = window.confirm('Deletar esta ACL?');
-                  if (ok) deleteMutation.mutate();
+                  setIsDeleteOpen(true);
                 }}
               >
                 {deleteMutation.isPending ? 'Deleting…' : 'Delete'}

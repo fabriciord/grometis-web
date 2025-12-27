@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -33,8 +34,8 @@ export default function KeyauthEditPage() {
 
   const [draftKey, setDraftKey] = useState<string | null>(null);
   const [draftTtl, setDraftTtl] = useState<string | null>(null);
-  const [draftConsumerId, setDraftConsumerId] = useState<string | null>(null);
   const [draftTags, setDraftTags] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -72,7 +73,7 @@ export default function KeyauthEditPage() {
         ? ''
         : String(keyauthQuery.data.ttl)
       : '');
-  const consumerId = draftConsumerId ?? keyauthQuery.data?.consumerId ?? '';
+  const consumerId = keyauthQuery.data?.consumerId ?? '';
   const tags = draftTags ?? (keyauthQuery.data?.tags?.join(', ') ?? '');
 
   const updateMutation = useMutation({
@@ -84,7 +85,6 @@ export default function KeyauthEditPage() {
 
       const payload: Record<string, unknown> = {
         key,
-        consumerId,
         ttl: ttlValue,
         tags: tags.trim().length ? splitCsv(tags) : null,
       };
@@ -115,13 +115,32 @@ export default function KeyauthEditPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={isDeleteOpen}
+        title="Deletar credencial KeyAuth?"
+        description="Deletar esta credencial KeyAuth? Essa ação não pode ser desfeita."
+        tone="danger"
+        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
+        cancelLabel="Cancelar"
+        busy={deleteMutation.isPending}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={() => {
+          deleteMutation.mutate();
+          setIsDeleteOpen(false);
+        }}
+      />
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit KeyAuth</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize key/ttl/consumer/tags.</p>
+          <p className="mt-1 text-sm text-zinc-600">Atualize key/ttl/tags.</p>
         </div>
         <Link
-          href={`/w/${params.workspaceId}/gateway/keyauth-consumers/${params.keyauthConsumerId}`}
+          href={
+            keyauthQuery.data?.consumerId
+              ? `/w/${params.workspaceId}/gateway/consumers/${keyauthQuery.data.consumerId}`
+              : `/w/${params.workspaceId}/gateway/keyauth-consumers/${params.keyauthConsumerId}`
+          }
           className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
         >
           Back
@@ -168,9 +187,12 @@ export default function KeyauthEditPage() {
               <select
                 className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
                 value={selectedConsumerId}
-                onChange={(e) => setDraftConsumerId(e.target.value)}
+                disabled
                 required
               >
+                {consumerId && !(consumersQuery.data ?? []).some((c) => c.id === consumerId) ? (
+                  <option value={consumerId}>{consumerId}</option>
+                ) : null}
                 {(consumersQuery.data ?? []).map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.username}
@@ -202,8 +224,7 @@ export default function KeyauthEditPage() {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => {
-                  const ok = window.confirm('Deletar esta credencial KeyAuth?');
-                  if (ok) deleteMutation.mutate();
+                  setIsDeleteOpen(true);
                 }}
               >
                 {deleteMutation.isPending ? 'Deleting…' : 'Delete'}

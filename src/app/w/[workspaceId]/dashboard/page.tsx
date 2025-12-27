@@ -1,9 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -32,6 +33,27 @@ type ConsumerListItem = {
 type PluginListItem = {
   id: string;
   name: string;
+  createdAt: string;
+};
+
+type RouteListItem = {
+  id: string;
+  name: string | null;
+  serviceId: string;
+  createdAt: string;
+};
+
+type AclListItem = {
+  id: string;
+  group: string;
+  consumerId: string;
+  createdAt: string;
+};
+
+type KeyauthConsumerListItem = {
+  id: string;
+  key: string;
+  consumerId: string;
   createdAt: string;
 };
 
@@ -138,9 +160,11 @@ function svgAreaFromLine(linePath: string, width: number, height: number) {
 }
 
 export default function WorkspaceDashboardPage() {
+    const [isDeleteWorkspaceOpen, setIsDeleteWorkspaceOpen] = useState(false);
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
   const token = useMemo(() => getAccessToken(), []);
+  const queryClient = useQueryClient();
   const [timeframe, setTimeframe] = useState<Timeframe>('12h');
 
   useEffect(() => {
@@ -180,6 +204,18 @@ export default function WorkspaceDashboardPage() {
     enabled: !!token,
   });
 
+  const routesQuery = useQuery({
+    queryKey: ['routes', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ routes: RouteListItem[] }>(
+        `/workspaces/${params.workspaceId}/routes`,
+        { token },
+      );
+      return res.routes;
+    },
+    enabled: !!token,
+  });
+
   const consumersQuery = useQuery({
     queryKey: ['consumers', params.workspaceId],
     queryFn: async () => {
@@ -204,8 +240,64 @@ export default function WorkspaceDashboardPage() {
     enabled: !!token,
   });
 
+  const aclsQuery = useQuery({
+    queryKey: ['acls', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ acls: AclListItem[] }>(
+        `/workspaces/${params.workspaceId}/acls`,
+        { token },
+      );
+      return res.acls;
+    },
+    enabled: !!token,
+  });
+
+  const keyauthConsumersQuery = useQuery({
+    queryKey: ['keyauth-consumers', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ keyauthConsumers: KeyauthConsumerListItem[] }>(
+        `/workspaces/${params.workspaceId}/keyauth-consumers`,
+        { token },
+      );
+      return res.keyauthConsumers;
+    },
+    enabled: !!token,
+  });
+
+  const deleteWorkspaceMutation = useMutation({
+    mutationFn: async () => {
+      return apiFetch<{ ok: true }>(`/workspaces/${params.workspaceId}`, {
+        method: 'DELETE',
+        token,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      router.push('/workspace');
+    },
+  });
+
   const workspaceName =
     workspacesQuery.data?.find((w) => w.id === params.workspaceId)?.name ?? params.workspaceId;
+
+  const workspaceRole =
+    workspacesQuery.data?.find((w) => w.id === params.workspaceId)?.role ?? 'viewer';
+
+  const isWorkspaceEmpty =
+    (servicesQuery.data?.length ?? 0) === 0 &&
+    (routesQuery.data?.length ?? 0) === 0 &&
+    (pluginsQuery.data?.length ?? 0) === 0 &&
+    (consumersQuery.data?.length ?? 0) === 0 &&
+    (aclsQuery.data?.length ?? 0) === 0 &&
+    (keyauthConsumersQuery.data?.length ?? 0) === 0;
+
+  const canDeleteWorkspace = workspaceRole === 'owner' && isWorkspaceEmpty;
+  const deleteWorkspaceHelp =
+    workspaceRole !== 'owner'
+      ? 'Apenas o owner pode excluir o workspace.'
+      : !isWorkspaceEmpty
+        ? 'O workspace precisa estar vazio (sem services, routes, plugins, consumers e credenciais) para excluir.'
+        : null;
 
   const now = new Date();
   const start = useMemo(() => startForTimeframe(now, timeframe), [now, timeframe]);
@@ -275,24 +367,42 @@ export default function WorkspaceDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={isDeleteWorkspaceOpen}
+        title="Excluir workspace?"
+        description="Excluir este workspace? Essa ação não pode ser desfeita."
+        tone="danger"
+        confirmLabel={deleteWorkspaceMutation.isPending ? 'Excluindo…' : 'Excluir'}
+        cancelLabel="Cancelar"
+        busy={deleteWorkspaceMutation.isPending}
+        onCancel={() => setIsDeleteWorkspaceOpen(false)}
+        onConfirm={() => {
+          deleteWorkspaceMutation.mutate();
+          setIsDeleteWorkspaceOpen(false);
+        }}
+      />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-zinc-900">{workspaceName} Workspace</h1>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="text-xs text-zinc-500">Timeframe:</div>
-          <select
-            className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900"
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value as Timeframe)}
-          >
-            {(['1h', '6h', '12h', '24h', '7d'] as const).map((tf) => (
-              <option key={tf} value={tf}>
-                {timeframeLabel(tf)}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-zinc-500">Timeframe:</div>
+              <select
+                className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900"
+                value={timeframe}
+                onChange={(e) => setTimeframe(e.target.value as Timeframe)}
+              >
+                {(['1h', '6h', '12h', '24h', '7d'] as const).map((tf) => (
+                  <option key={tf} value={tf}>
+                    {timeframeLabel(tf)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -517,6 +627,26 @@ export default function WorkspaceDashboardPage() {
             <div className="text-sm font-medium text-zinc-900">Developer Portal is disabled</div>
             <div className="mt-2 text-sm text-zinc-600">Enable Dev Portal para expor documentação de APIs.</div>
           </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <div className="flex flex-col items-end gap-2">
+          <button
+            type="button"
+            className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!canDeleteWorkspace || deleteWorkspaceMutation.isPending}
+            title={deleteWorkspaceHelp ?? undefined}
+            onClick={() => {
+              if (!canDeleteWorkspace) return;
+              setIsDeleteWorkspaceOpen(true);
+            }}
+          >
+            {deleteWorkspaceMutation.isPending ? 'Excluindo…' : 'Delete Workspace'}
+          </button>
+          {deleteWorkspaceMutation.isError ? (
+            <div className="text-xs text-red-700">Falha ao excluir. Verifique se o workspace está vazio.</div>
+          ) : null}
         </div>
       </div>
     </div>

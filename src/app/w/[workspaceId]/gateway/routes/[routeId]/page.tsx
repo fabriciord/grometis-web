@@ -115,6 +115,7 @@ export default function RouteViewPage() {
     enabled: !!token,
   });
 
+
   const serviceQuery = useQuery({
     queryKey: ['service', params.workspaceId, routeQuery.data?.serviceId ?? null],
     queryFn: async () => {
@@ -152,6 +153,7 @@ export default function RouteViewPage() {
     },
     enabled: !!token,
   });
+
 
   const route = routeQuery.data;
   const service = serviceQuery.data;

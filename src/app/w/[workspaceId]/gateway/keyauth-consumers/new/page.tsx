@@ -47,6 +47,8 @@ export default function KeyauthNewPage() {
   const selectedConsumerId =
     consumerId || consumerIdFromQuery || consumersQuery.data?.[0]?.id || '';
 
+  const consumerLocked = !!consumerIdFromQuery;
+
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!selectedConsumerId) {
@@ -130,7 +132,11 @@ export default function KeyauthNewPage() {
             <select
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
               value={selectedConsumerId}
-              onChange={(e) => setConsumerId(e.target.value)}
+              onChange={(e) => {
+                if (consumerLocked) return;
+                setConsumerId(e.target.value);
+              }}
+              disabled={consumerLocked}
               required
             >
               {(consumersQuery.data ?? []).map((c) => (

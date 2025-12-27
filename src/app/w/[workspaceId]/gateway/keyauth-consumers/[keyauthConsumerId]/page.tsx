@@ -49,7 +49,11 @@ export default function KeyauthViewPage() {
         </div>
         <div className="flex gap-2">
           <Link
-            href={`/w/${params.workspaceId}/gateway/keyauth-consumers`}
+            href={
+              k?.consumerId
+                ? `/w/${params.workspaceId}/gateway/consumers/${k.consumerId}`
+                : `/w/${params.workspaceId}/gateway/keyauth-consumers`
+            }
             className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
           >
             Back
@@ -79,7 +83,14 @@ export default function KeyauthViewPage() {
             </div>
             <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Consumer</dt>
-              <dd className="mt-1 break-all text-sm text-zinc-900">{k.consumerId}</dd>
+              <dd className="mt-1 break-all text-sm">
+                <Link
+                  href={`/w/${params.workspaceId}/gateway/consumers/${k.consumerId}`}
+                  className="text-zinc-900 hover:underline"
+                >
+                  {k.consumerId}
+                </Link>
+              </dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Tags</dt>

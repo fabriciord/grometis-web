@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -37,6 +38,7 @@ export default function SchemaEditPage() {
   const [draftName, setDraftName] = useState<string | null>(null);
   const [draftSchemaText, setDraftSchemaText] = useState<string | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -96,6 +98,21 @@ export default function SchemaEditPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={isDeleteOpen}
+        title="Deletar schema?"
+        description="Deletar este schema? Essa ação não pode ser desfeita."
+        tone="danger"
+        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
+        cancelLabel="Cancelar"
+        busy={deleteMutation.isPending}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={() => {
+          deleteMutation.mutate();
+          setIsDeleteOpen(false);
+        }}
+      />
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit schema</h1>
@@ -157,8 +174,7 @@ export default function SchemaEditPage() {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => {
-                  const ok = window.confirm('Deletar este schema?');
-                  if (ok) deleteMutation.mutate();
+                  setIsDeleteOpen(true);
                 }}
               >
                 {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
