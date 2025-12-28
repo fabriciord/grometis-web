@@ -21,10 +21,11 @@ type PluginListItem = {
   createdAt: string;
 };
 
-function targetLabel(p: PluginListItem): string {
+function targetLabel(p: PluginListItem, workspaceId: string): string {
   if (p.serviceId) return `service: ${p.serviceId}`;
   if (p.routeId) return `route: ${p.routeId}`;
   if (p.consumerId) return `consumer: ${p.consumerId}`;
+  if (p.isGlobal) return `workspace: ${workspaceId}`;
   return 'target: -';
 }
 
@@ -93,7 +94,7 @@ export default function PluginsPage() {
               {(pluginsQuery.data ?? []).map((p) => (
                 <tr key={p.id}>
                   <td className="px-4 py-3 font-medium text-zinc-900">{p.name}</td>
-                  <td className="px-4 py-3 text-zinc-700">{targetLabel(p)}</td>
+                  <td className="px-4 py-3 text-zinc-700">{targetLabel(p, params.workspaceId)}</td>
                   <td className="px-4 py-3 text-zinc-700">
                     {p.enabled ? 'enabled' : 'disabled'}
                     {p.isGlobal ? ' · global' : ''}

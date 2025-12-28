@@ -15,6 +15,16 @@ type AclListItem = {
   createdAt: string;
 };
 
+type PluginListItem = {
+  id: string;
+  name: string;
+  enabled?: boolean;
+  routeId?: string | null;
+  serviceId?: string | null;
+  consumerId?: string | null;
+  isGlobal?: boolean;
+};
+
 export default function AclsPage() {
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
@@ -36,6 +46,35 @@ export default function AclsPage() {
     enabled: !!token,
   });
 
+  const pluginsQuery = useQuery({
+    queryKey: ['plugins', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ plugins: PluginListItem[] }>(
+        `/workspaces/${params.workspaceId}/plugins`,
+        { token },
+      );
+      return res.plugins;
+    },
+    enabled: !!token,
+  });
+
+  const hasAclPluginAvailableInWorkspace = useMemo(() => {
+    return (pluginsQuery.data ?? []).some((p) => {
+      const name = p.name.trim().toLowerCase();
+      const enabled = p.enabled ?? true;
+      if (name !== 'acl' || !enabled) return false;
+      return (
+        Boolean(p.routeId) ||
+        Boolean(p.serviceId) ||
+        Boolean(p.consumerId) ||
+        p.isGlobal === true
+      );
+    });
+  }, [pluginsQuery.data]);
+
+  const pluginsReady = !pluginsQuery.isLoading && !pluginsQuery.isError;
+  const canCreateAcl = pluginsReady && hasAclPluginAvailableInWorkspace;
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -43,12 +82,29 @@ export default function AclsPage() {
           <h1 className="text-xl font-semibold text-zinc-900">ACLs</h1>
           <p className="mt-1 text-sm text-zinc-600">Grupos ACL associados a um consumer.</p>
         </div>
-        <Link
-          href={`/w/${params.workspaceId}/gateway/acls/new`}
-          className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
-        >
-          New ACL
-        </Link>
+        {canCreateAcl ? (
+          <Link
+            href={`/w/${params.workspaceId}/gateway/acls/new`}
+            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+          >
+            New ACL
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title={
+              pluginsQuery.isLoading
+                ? 'Carregando plugins do workspace…'
+                : pluginsQuery.isError
+                  ? 'Falha ao carregar plugins do workspace.'
+                  : 'Instale o plugin ACL em rota, service, consumer ou como global neste workspace para habilitar ACLs.'
+            }
+            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            New ACL
+          </button>
+        )}
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white">

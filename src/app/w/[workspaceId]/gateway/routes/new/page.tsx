@@ -50,15 +50,11 @@ export default function NewRoutePage() {
     enabled: !!token,
   });
 
-  useEffect(() => {
-    const pref = searchParams.get('serviceId');
-    if (!pref) return;
-    if (serviceId) return;
-    const exists = (servicesQuery.data ?? []).some((s) => s.id === pref);
-    if (exists) setServiceId(pref);
-  }, [searchParams, serviceId, servicesQuery.data]);
+  const serviceIdFromQuery = searchParams.get('serviceId') ?? '';
+  const queryServiceIdIsValid = (servicesQuery.data ?? []).some((s) => s.id === serviceIdFromQuery);
 
-  const selectedServiceId = serviceId || servicesQuery.data?.[0]?.id || '';
+  const selectedServiceId =
+    serviceId || (queryServiceIdIsValid ? serviceIdFromQuery : servicesQuery.data?.[0]?.id || '');
 
   const createRouteMutation = useMutation({
     mutationFn: async () => {

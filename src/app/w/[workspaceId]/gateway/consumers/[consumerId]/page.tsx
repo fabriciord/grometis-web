@@ -33,6 +33,25 @@ type KeyauthConsumerListItem = {
   createdAt: string;
 };
 
+type PluginListItem = {
+  id: string;
+  name: string;
+  enabled?: boolean;
+  routeId?: string | null;
+  serviceId?: string | null;
+  consumerId?: string | null;
+  isGlobal?: boolean;
+};
+
+function normalizePluginName(name: unknown): string {
+  return typeof name === 'string' ? name.trim().toLowerCase() : '';
+}
+
+function isKeyAuthPluginName(name: unknown): boolean {
+  const n = normalizePluginName(name);
+  return n === 'key-auth' || n === 'keyauth' || n === 'keyauthconsumer';
+}
+
 export default function ConsumerViewPage() {
   const params = useParams<{ workspaceId: string; consumerId: string }>();
   const router = useRouter();
@@ -79,6 +98,69 @@ export default function ConsumerViewPage() {
     },
     enabled: !!token,
   });
+
+  const pluginsQuery = useQuery({
+    queryKey: ['plugins', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ plugins: PluginListItem[] }>(
+        `/workspaces/${params.workspaceId}/plugins`,
+        { token },
+      );
+      return res.plugins;
+    },
+    enabled: !!token,
+  });
+
+  const hasAclPluginInAnyRoute = (pluginsQuery.data ?? []).some((p) => {
+    const name = normalizePluginName(p?.name);
+    const enabled = p.enabled ?? true;
+    return name === 'acl' && enabled && Boolean(p.routeId);
+  });
+
+  const hasAclPluginInAnyService = (pluginsQuery.data ?? []).some((p) => {
+    const name = normalizePluginName(p?.name);
+    const enabled = p.enabled ?? true;
+    return name === 'acl' && enabled && Boolean(p.serviceId);
+  });
+
+  const hasAclPluginInAnyConsumer = (pluginsQuery.data ?? []).some((p) => {
+    const name = normalizePluginName(p?.name);
+    const enabled = p.enabled ?? true;
+    return name === 'acl' && enabled && Boolean(p.consumerId);
+  });
+
+  const hasAclPluginGlobal = (pluginsQuery.data ?? []).some((p) => {
+    const name = normalizePluginName(p?.name);
+    const enabled = p.enabled ?? true;
+    return name === 'acl' && enabled && p.isGlobal === true;
+  });
+
+  const hasKeyauthPluginInAnyRoute = (pluginsQuery.data ?? []).some((p) => {
+    const enabled = p.enabled ?? true;
+    return isKeyAuthPluginName(p?.name) && enabled && Boolean(p.routeId);
+  });
+
+  const hasKeyauthPluginInAnyService = (pluginsQuery.data ?? []).some((p) => {
+    const enabled = p.enabled ?? true;
+    return isKeyAuthPluginName(p?.name) && enabled && Boolean(p.serviceId);
+  });
+
+  const hasKeyauthPluginGlobal = (pluginsQuery.data ?? []).some((p) => {
+    const enabled = p.enabled ?? true;
+    return isKeyAuthPluginName(p?.name) && enabled && p.isGlobal === true;
+  });
+
+  const hasKeyauthPluginAnywhere = (pluginsQuery.data ?? []).some((p) => {
+    const enabled = p.enabled ?? true;
+    return isKeyAuthPluginName(p?.name) && enabled;
+  });
+  const pluginsReady = !pluginsQuery.isLoading && !pluginsQuery.isError;
+  const canCreateAcl =
+    pluginsReady &&
+    (hasAclPluginInAnyRoute || hasAclPluginInAnyService || hasAclPluginInAnyConsumer || hasAclPluginGlobal);
+  const canCreateKeyauth =
+    pluginsReady &&
+    (hasKeyauthPluginInAnyRoute || hasKeyauthPluginInAnyService || hasKeyauthPluginGlobal);
 
   const consumer = consumerQuery.data;
 
@@ -154,14 +236,31 @@ export default function ConsumerViewPage() {
               <div className="text-sm font-semibold text-zinc-900">ACLs</div>
               <div className="mt-1 text-sm text-zinc-600">Grupos ACL vinculados a este consumer.</div>
             </div>
-            <Link
-              href={`/w/${params.workspaceId}/gateway/acls/new?consumerId=${encodeURIComponent(
-                params.consumerId,
-              )}`}
-              className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
-            >
-              New ACL
-            </Link>
+            {canCreateAcl ? (
+              <Link
+                href={`/w/${params.workspaceId}/gateway/acls/new?consumerId=${encodeURIComponent(
+                  params.consumerId,
+                )}`}
+                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+              >
+                New ACL
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title={
+                  pluginsQuery.isLoading
+                    ? 'Carregando plugins do workspace…'
+                    : pluginsQuery.isError
+                      ? 'Falha ao carregar plugins do workspace.'
+                      : 'Instale o plugin ACL em rota, service, consumer ou como global neste workspace para habilitar ACLs.'
+                }
+                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                New ACL
+              </button>
+            )}
           </div>
 
           <div className="p-4">
@@ -220,14 +319,33 @@ export default function ConsumerViewPage() {
               <div className="text-sm font-semibold text-zinc-900">KeyAuth</div>
               <div className="mt-1 text-sm text-zinc-600">Credenciais KeyAuth vinculadas a este consumer.</div>
             </div>
-            <Link
-              href={`/w/${params.workspaceId}/gateway/keyauth-consumers/new?consumerId=${encodeURIComponent(
-                params.consumerId,
-              )}`}
-              className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
-            >
-              New KeyAuth
-            </Link>
+            {canCreateKeyauth ? (
+              <Link
+                href={`/w/${params.workspaceId}/gateway/keyauth-consumers/new?consumerId=${encodeURIComponent(
+                  params.consumerId,
+                )}`}
+                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+              >
+                New KeyAuth
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title={
+                  pluginsQuery.isLoading
+                    ? 'Carregando plugins do workspace…'
+                    : pluginsQuery.isError
+                      ? 'Falha ao carregar plugins do workspace.'
+                      : hasKeyauthPluginAnywhere
+                        ? 'O plugin KeyAuth está habilitado, mas não está instalado em rota nem service. Instale-o em uma rota ou service (ou deixe como global) para habilitar KeyAuth.'
+                        : 'Instale o plugin KeyAuth em uma rota, service ou como global para habilitar KeyAuth.'
+                }
+                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                New KeyAuth
+              </button>
+            )}
           </div>
 
           <div className="p-4">

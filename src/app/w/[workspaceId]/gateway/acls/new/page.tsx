@@ -9,6 +9,16 @@ import { getAccessToken } from '@/lib/auth';
 
 type ConsumerListItem = { id: string; username: string };
 
+type PluginListItem = {
+  id: string;
+  name: string;
+  enabled?: boolean;
+  routeId?: string | null;
+  serviceId?: string | null;
+  consumerId?: string | null;
+  isGlobal?: boolean;
+};
+
 function splitCsv(value: string): string[] {
   return value
     .split(',')
@@ -42,6 +52,42 @@ export default function AclNewPage() {
     enabled: !!token,
   });
 
+  const pluginsQuery = useQuery({
+    queryKey: ['plugins', params.workspaceId],
+    queryFn: async () => {
+      const res = await apiFetch<{ plugins: PluginListItem[] }>(
+        `/workspaces/${params.workspaceId}/plugins`,
+        { token },
+      );
+      return res.plugins;
+    },
+    enabled: !!token,
+  });
+
+  const hasAclPluginAvailableInWorkspace = useMemo(() => {
+    return (pluginsQuery.data ?? []).some((p) => {
+      const name = p.name.trim().toLowerCase();
+      const enabled = p.enabled ?? true;
+
+      if (name !== 'acl' || !enabled) return false;
+
+      return (
+        Boolean(p.routeId) ||
+        Boolean(p.serviceId) ||
+        Boolean(p.consumerId) ||
+        p.isGlobal === true
+      );
+    });
+  }, [pluginsQuery.data]);
+
+  const aclBlockedReason = pluginsQuery.isLoading
+    ? 'Carregando plugins do workspace…'
+    : pluginsQuery.isError
+      ? 'Falha ao carregar plugins do workspace.'
+      : !hasAclPluginAvailableInWorkspace
+        ? 'Este recurso só pode ser usado quando o plugin ACL estiver habilitado neste workspace e instalado em rota, service, consumer ou como global.'
+        : null;
+
   const consumerIdFromQuery = searchParams.get('consumerId') ?? '';
   const selectedConsumerId =
     consumerId || consumerIdFromQuery || consumersQuery.data?.[0]?.id || '';
@@ -50,6 +96,10 @@ export default function AclNewPage() {
 
   const createAclMutation = useMutation({
     mutationFn: async () => {
+      if (aclBlockedReason) {
+        throw { status: 400, message: aclBlockedReason } satisfies ApiError;
+      }
+
       const payload: Record<string, unknown> = {
         group,
         consumerId: selectedConsumerId,
@@ -142,10 +192,31 @@ export default function AclNewPage() {
           </label>
 
           <div className="sm:col-span-2">
+            {aclBlockedReason ? (
+              <div className="mb-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                <div className="font-medium">Ação bloqueada</div>
+                <div className="mt-1">{aclBlockedReason}</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Link
+                    href={`/w/${params.workspaceId}/gateway/plugins/new`}
+                    className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+                  >
+                    Instalar plugin
+                  </Link>
+                  <Link
+                    href={`/w/${params.workspaceId}/gateway/consumers/${encodeURIComponent(selectedConsumerId)}`}
+                    className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                  >
+                    Voltar ao consumer
+                  </Link>
+                </div>
+              </div>
+            ) : null}
             <button
               className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
               type="submit"
-              disabled={createAclMutation.isPending}
+              disabled={createAclMutation.isPending || !!aclBlockedReason}
+              title={aclBlockedReason ?? undefined}
             >
               {createAclMutation.isPending ? 'Creating…' : 'Create ACL'}
             </button>
