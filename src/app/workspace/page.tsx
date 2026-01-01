@@ -1,6 +1,7 @@
 'use client';
 
 import { useQueries, useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -162,7 +163,7 @@ export default function SelectWorkspacePage() {
     enabled: !!token,
   });
 
-  const workspaces = workspacesQuery.data ?? [];
+  const workspaces = useMemo(() => workspacesQuery.data ?? [], [workspacesQuery.data]);
 
   const activitiesQueries = useQueries({
     queries: workspaces.map((w) => ({
@@ -179,9 +180,14 @@ export default function SelectWorkspacePage() {
     })),
   });
 
-  const now = useMemo(() => new Date(), [timeframe]);
-  const start = useMemo(() => startForTimeframe(now, timeframe), [now, timeframe]);
-  const bucketMinutes = bucketMinutesForTimeframe(timeframe);
+  const { now, start, bucketMinutes } = useMemo(() => {
+    const currentNow = new Date();
+    return {
+      now: currentNow,
+      start: startForTimeframe(currentNow, timeframe),
+      bucketMinutes: bucketMinutesForTimeframe(timeframe),
+    };
+  }, [timeframe]);
 
   const activitiesByWorkspaceId = useMemo(() => {
     const map = new Map<string, ActivityListItem[]>();
@@ -194,7 +200,7 @@ export default function SelectWorkspacePage() {
     return map;
   }, [activitiesQueries, start, workspaces]);
 
-  const { keys, seriesByWorkspaceId, totalsByWorkspaceId, overallSeries, overallStats } = useMemo(() => {
+  const { seriesByWorkspaceId, totalsByWorkspaceId, overallSeries, overallStats } = useMemo(() => {
     const startBucket = clampDateToBucket(start, bucketMinutes);
     const endBucket = clampDateToBucket(now, bucketMinutes);
     const bucketMs = bucketMinutes * 60 * 1000;
@@ -263,7 +269,6 @@ export default function SelectWorkspacePage() {
     const overallAvgErrorRate = overallTotal === 0 ? 0 : (overallErrorsTotal / overallTotal) * 100;
 
     return {
-      keys: bucketKeys,
       seriesByWorkspaceId: perWs,
       totalsByWorkspaceId: totals,
       overallSeries: { success: overallSuccess, error: overallError },
@@ -309,9 +314,11 @@ export default function SelectWorkspacePage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
             {showBrandLogo ? (
-              <img
+              <Image
                 src="/brand/grometis-logo.png"
                 alt="GrOMEtiS"
+                width={32}
+                height={32}
                 className="h-8 w-8 rounded-md border border-zinc-200 bg-white object-contain"
                 onError={() => setShowBrandLogo(false)}
               />
@@ -416,10 +423,10 @@ export default function SelectWorkspacePage() {
         <div className="text-lg font-semibold text-zinc-900">Requests</div>
         <div className="mt-3 rounded-xl border border-zinc-200 bg-white p-4">
           {workspacesQuery.isLoading || isLoadingActivities ? (
-            <div className="text-sm text-zinc-600">Carregando…</div>
+            <div className="text-sm text-zinc-600">Loading…</div>
           ) : null}
           {workspacesQuery.isError || isErrorActivities ? (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">Falha ao carregar dados.</div>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">Failed to load data.</div>
           ) : null}
 
           {!workspacesQuery.isLoading && !workspacesQuery.isError && !isLoadingActivities && !isErrorActivities ? (
@@ -482,14 +489,14 @@ export default function SelectWorkspacePage() {
           }`}
         >
           {workspacesQuery.isLoading ? (
-            <div className="text-sm text-zinc-600">Carregando…</div>
+            <div className="text-sm text-zinc-600">Loading…</div>
           ) : null}
           {workspacesQuery.isError ? (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">Falha ao carregar workspaces.</div>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">Failed to load workspaces.</div>
           ) : null}
 
           {!workspacesQuery.isLoading && !workspacesQuery.isError && filteredWorkspaces.length === 0 ? (
-            <div className="text-sm text-zinc-600">Nenhum workspace encontrado.</div>
+            <div className="text-sm text-zinc-600">No workspaces found.</div>
           ) : null}
 
           {filteredWorkspaces.map((w) => {
@@ -517,10 +524,13 @@ export default function SelectWorkspacePage() {
               >
                 <div className="flex items-start gap-3">
                   {w.avatar?.imageDataUrl ? (
-                    <img
+                    <Image
                       src={w.avatar.imageDataUrl}
                       alt=""
+                      width={32}
+                      height={32}
                       className="h-8 w-8 rounded-md border border-zinc-200 bg-white object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div

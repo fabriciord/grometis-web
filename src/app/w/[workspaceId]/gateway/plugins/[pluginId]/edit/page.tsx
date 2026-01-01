@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
+import { HelpHint } from '@/app/_components/HelpHint';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -367,7 +368,7 @@ function PluginConfigForm({
   if (!configFields.length) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
-        Schema disponível, mas não foi possível extrair os campos de `config`.
+        Schema is available, but we could not extract the `config` fields.
       </div>
     );
   }
@@ -393,7 +394,6 @@ function splitCsv(value: string): string[] {
 }
 
 export default function PluginEditPage() {
-    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const params = useParams<{ workspaceId: string; pluginId: string }>();
   const router = useRouter();
   const token = useMemo(() => getAccessToken(), []);
@@ -471,11 +471,11 @@ export default function PluginEditPage() {
   const routes = routesQuery.data ?? [];
 
   if (pluginQuery.isLoading || servicesQuery.isLoading || routesQuery.isLoading) {
-    return <div className="text-sm text-zinc-600">Carregando…</div>;
+    return <div className="text-sm text-zinc-600">Loading…</div>;
   }
 
   if (pluginQuery.isError || !plugin) {
-    return <div className="text-sm text-red-700">Falha ao carregar plugin.</div>;
+    return <div className="text-sm text-red-700">Failed to load plugin.</div>;
   }
 
   return (
@@ -483,7 +483,7 @@ export default function PluginEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="truncate text-xl font-semibold text-zinc-900">Edit plugin: {plugin.name}</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize as configurações do plugin.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update plugin configuration.</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -605,11 +605,11 @@ function PluginEditForm({
     <div className="rounded-xl border border-zinc-200 bg-white p-4">
       <ConfirmDialog
         open={isDeleteOpen}
-        title="Excluir plugin?"
-        description="Excluir este plugin? Essa ação não pode ser desfeita."
+        title="Delete plugin?"
+        description="Delete this plugin? This action cannot be undone."
         tone="danger"
-        confirmLabel={deletePluginMutation.isPending ? 'Excluindo…' : 'Excluir'}
-        cancelLabel="Cancelar"
+        confirmLabel={deletePluginMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deletePluginMutation.isPending}
         onCancel={() => setIsDeleteOpen(false)}
         onConfirm={() => {
@@ -628,13 +628,13 @@ function PluginEditForm({
         <div className="sm:col-span-2">
           <div className="text-sm text-zinc-700">Name</div>
           <div className="mt-1 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900">{plugin.name}</div>
-          <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+          <div className="mt-1 text-xs text-zinc-500">Read-only</div>
         </div>
 
         <label className="flex items-center gap-2 sm:col-span-2">
           <input checked={plugin.enabled} type="checkbox" disabled />
           <span className="text-sm text-zinc-700">Enabled</span>
-          <span className="text-xs text-zinc-500">(somente leitura)</span>
+          <span className="text-xs text-zinc-500">(read-only)</span>
         </label>
 
         <div className="sm:col-span-2">
@@ -655,7 +655,7 @@ function PluginEditForm({
               />
               <div>
                 <div className="text-sm text-zinc-900">Global</div>
-                <div className="text-xs text-zinc-500">Todos services, routes e consumers</div>
+                <div className="text-xs text-zinc-500">All services, routes, and consumers</div>
               </div>
             </label>
             <label className="flex items-start gap-2">
@@ -674,11 +674,13 @@ function PluginEditForm({
               />
               <div>
                 <div className="text-sm text-zinc-900">Scoped</div>
-                <div className="text-xs text-zinc-500">Alvo atual (somente leitura)</div>
+                <div className="text-xs text-zinc-500">Current target (read-only)</div>
               </div>
             </label>
             {!canSwitchToScoped && isGlobal ? (
-              <div className="text-xs text-zinc-500">Não é possível mudar de Global para Scoped sem um alvo existente.</div>
+              <div className="text-xs text-zinc-500">
+                You can&apos;t switch from Global to Scoped without an existing target.
+              </div>
             ) : null}
           </div>
         </div>
@@ -699,7 +701,7 @@ function PluginEditForm({
                 </option>
               ))}
             </select>
-            <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+            <div className="mt-1 text-xs text-zinc-500">Read-only</div>
           </label>
         ) : null}
 
@@ -719,7 +721,7 @@ function PluginEditForm({
                 </option>
               ))}
             </select>
-            <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+            <div className="mt-1 text-xs text-zinc-500">Read-only</div>
           </label>
         ) : null}
 
@@ -730,15 +732,18 @@ function PluginEditForm({
               value={consumerId}
               onChange={() => {}}
               className="mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900"
-              placeholder="uuid-do-consumer"
+              placeholder="consumer-uuid"
               disabled
             />
-            <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+            <div className="mt-1 text-xs text-zinc-500">Read-only</div>
           </label>
         ) : null}
 
         <label className="block sm:col-span-2">
-          <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm text-zinc-700">Tags</span>
+            <HelpHint text="Optional. Comma-separated values." />
+          </div>
           <input
             ref={tagsRef}
             defaultValue={plugin.tags?.join(',') ?? ''}
@@ -752,14 +757,14 @@ function PluginEditForm({
           <div className="mt-1 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900">
             {plugin.protocols.join(', ')}
           </div>
-          <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+          <div className="mt-1 text-xs text-zinc-500">Read-only</div>
         </div>
 
         <div className="sm:col-span-2">
           {schema ? (
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
               <div className="text-sm font-semibold text-zinc-900">Config</div>
-              <div className="mt-1 text-xs text-zinc-600">Edite: campos gerados pelo schema.</div>
+              <div className="mt-1 text-xs text-zinc-600">Edit: fields generated from the schema.</div>
 
               <div className="mt-3">
                 <PluginConfigForm
@@ -771,10 +776,10 @@ function PluginEditForm({
               </div>
             </div>
           ) : schemaIsLoading ? (
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">Carregando schema…</div>
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">Loading schema…</div>
           ) : (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              Schema não encontrado para este plugin. O config será mantido como está (sem edição via JSON).
+              Schema not found for this plugin. Config will be kept as-is (no editing via JSON).
             </div>
           )}
         </div>
@@ -785,7 +790,7 @@ function PluginEditForm({
             disabled={updatePluginMutation.isPending}
             type="submit"
           >
-            {updatePluginMutation.isPending ? 'Salvando…' : 'Save'}
+            {updatePluginMutation.isPending ? 'Saving…' : 'Save'}
           </button>
 
           <button
@@ -796,23 +801,23 @@ function PluginEditForm({
             }}
             type="button"
           >
-            {deletePluginMutation.isPending ? 'Excluindo…' : 'Delete'}
+            {deletePluginMutation.isPending ? 'Deleting…' : 'Delete'}
           </button>
         </div>
       </form>
 
       {isScoped ? (
         <div className="mt-3 rounded-md bg-zinc-50 p-3 text-sm text-zinc-700">
-          Service/Route/Consumer são somente leitura na edição.
+          Service/Route/Consumer are read-only while editing.
         </div>
       ) : null}
 
       {updatePluginMutation.isError ? (
-        <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">Falha ao salvar (precisa ser admin/owner).</div>
+        <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">Failed to save (must be admin/owner).</div>
       ) : null}
 
       {deletePluginMutation.isError ? (
-        <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">Falha ao excluir (precisa ser admin/owner).</div>
+        <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">Failed to delete (must be admin/owner).</div>
       ) : null}
     </div>
   );

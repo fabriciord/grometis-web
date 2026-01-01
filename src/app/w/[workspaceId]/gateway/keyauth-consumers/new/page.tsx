@@ -102,13 +102,13 @@ export default function KeyauthNewPage() {
   }, [pluginsQuery.data]);
 
   const keyauthBlockedReason = pluginsQuery.isLoading
-    ? 'Carregando plugins do workspace…'
+    ? 'Loading workspace plugins…'
     : pluginsQuery.isError
-      ? 'Falha ao carregar plugins do workspace.'
+      ? 'Failed to load workspace plugins.'
       : !(hasKeyauthPluginInAnyRoute || hasKeyauthPluginInAnyService || hasKeyauthPluginGlobal)
         ? hasKeyauthPluginAnywhere
-          ? 'O plugin KeyAuth está habilitado, mas não está instalado em rota nem service. Instale-o em uma rota ou service (ou deixe como global) para criar credenciais.'
-          : 'Este recurso só pode ser usado quando o plugin KeyAuth estiver instalado em uma rota, service ou como global neste workspace.'
+          ? 'The KeyAuth plugin is enabled, but it is not installed on any route or service. Install it on a route or service (or set it as global) to create credentials.'
+          : 'This feature can only be used when the KeyAuth plugin is installed on a route, service, or as global in this workspace.'
         : null;
 
   const consumerIdFromQuery = searchParams.get('consumerId') ?? '';
@@ -160,7 +160,7 @@ export default function KeyauthNewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New KeyAuth</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie uma credencial KeyAuth para um consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a KeyAuth credential for a consumer.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/keyauth-consumers`}
@@ -190,7 +190,7 @@ export default function KeyauthNewPage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">TTL (segundos)</span>
+            <span className="text-sm text-zinc-700">TTL (seconds)</span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
               value={ttl}
@@ -220,7 +220,7 @@ export default function KeyauthNewPage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+            <span className="text-sm text-zinc-700">Tags</span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
               value={tags}
@@ -232,20 +232,20 @@ export default function KeyauthNewPage() {
           <div className="sm:col-span-2">
             {keyauthBlockedReason ? (
               <div className="mb-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-                <div className="font-medium">Ação bloqueada</div>
+                <div className="font-medium">Action blocked</div>
                 <div className="mt-1">{keyauthBlockedReason}</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
                     href={`/w/${params.workspaceId}/gateway/plugins/new`}
                     className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
                   >
-                    Instalar plugin
+                    Install plugin
                   </Link>
                   <Link
                     href={`/w/${params.workspaceId}/gateway/consumers/${encodeURIComponent(selectedConsumerId)}`}
                     className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
                   >
-                    Voltar ao consumer
+                    Back to consumer
                   </Link>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function KeyauthNewPage() {
             </button>
 
             {createMutation.isError ? (
-              <div className="mt-2 text-sm text-red-700">Falha ao criar KeyAuth.</div>
+              <div className="mt-2 text-sm text-red-700">Failed to create KeyAuth.</div>
             ) : null}
           </div>
         </form>

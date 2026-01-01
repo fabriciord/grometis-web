@@ -181,7 +181,7 @@ function SchemaFieldsReadOnly({
                   </option>
                 ))}
               </select>
-              <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+              <div className="mt-1 text-xs text-zinc-500">Read-only</div>
             </label>
           );
         }
@@ -238,7 +238,7 @@ function SchemaFieldsReadOnly({
                     </option>
                   ))}
                 </select>
-                <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+                <div className="mt-1 text-xs text-zinc-500">Read-only</div>
               </label>
             );
           }
@@ -319,7 +319,7 @@ function PluginConfigReadOnly({ schema, plugin }: { schema: SchemaDetails; plugi
   if (!configFields.length) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
-        Schema disponível, mas não foi possível extrair os campos de `config`.
+        Schema is available, but we could not extract the `config` fields.
       </div>
     );
   }
@@ -433,9 +433,9 @@ export default function PluginViewPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white">
-        {pluginQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Carregando…</div> : null}
+        {pluginQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Loading…</div> : null}
         {pluginQuery.isError ? (
-          <div className="p-4 text-sm text-red-700">Falha ao carregar plugin.</div>
+          <div className="p-4 text-sm text-red-700">Failed to load plugin.</div>
         ) : null}
 
         {plugin ? (
@@ -444,13 +444,13 @@ export default function PluginViewPage() {
               <div className="sm:col-span-2">
                 <div className="text-sm text-zinc-700">Name</div>
                 <div className="mt-1 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900">{plugin.name}</div>
-                <div className="mt-1 text-xs text-zinc-500">Somente leitura</div>
+                <div className="mt-1 text-xs text-zinc-500">Read-only</div>
               </div>
 
               <label className="flex items-center gap-2 sm:col-span-2">
                 <input checked={plugin.enabled} type="checkbox" disabled />
                 <span className="text-sm text-zinc-700">Enabled</span>
-                <span className="text-xs text-zinc-500">(somente leitura)</span>
+                <span className="text-xs text-zinc-500">(read-only)</span>
               </label>
 
               <div className="sm:col-span-2">
@@ -460,14 +460,14 @@ export default function PluginViewPage() {
                     <input type="radio" name="scope" checked={plugin.isGlobal} disabled />
                     <div>
                       <div className="text-sm text-zinc-900">Global</div>
-                      <div className="text-xs text-zinc-500">Todos services, routes e consumers</div>
+                      <div className="text-xs text-zinc-500">All services, routes, and consumers</div>
                     </div>
                   </label>
                   <label className="flex items-start gap-2">
                     <input type="radio" name="scope" checked={!plugin.isGlobal} disabled />
                     <div>
                       <div className="text-sm text-zinc-900">Scoped</div>
-                      <div className="text-xs text-zinc-500">Alvo atual (somente leitura)</div>
+                      <div className="text-xs text-zinc-500">Current target (read-only)</div>
                     </div>
                   </label>
                 </div>
@@ -557,16 +557,16 @@ export default function PluginViewPage() {
 
             <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
               <div className="text-sm font-semibold text-zinc-900">Config</div>
-              <div className="mt-1 text-xs text-zinc-600">Visualização: campos gerados pelo schema.</div>
+              <div className="mt-1 text-xs text-zinc-600">View: fields generated from the schema.</div>
 
               <div className="mt-3">
                 {pluginSchemaQuery.data ? (
                   <PluginConfigReadOnly schema={pluginSchemaQuery.data} plugin={plugin} />
                 ) : pluginSchemaQuery.isLoading ? (
-                  <div className="text-sm text-zinc-600">Carregando schema…</div>
+                  <div className="text-sm text-zinc-600">Loading schema…</div>
                 ) : (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                    Schema não encontrado para este plugin. Não é possível renderizar o config no formato do schema.
+                    Schema not found for this plugin. Unable to render config using the schema format.
                   </div>
                 )}
               </div>

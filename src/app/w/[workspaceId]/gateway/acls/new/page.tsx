@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
+import { HelpHint } from '@/app/_components/HelpHint';
 
 type ConsumerListItem = { id: string; username: string };
 
@@ -81,11 +82,11 @@ export default function AclNewPage() {
   }, [pluginsQuery.data]);
 
   const aclBlockedReason = pluginsQuery.isLoading
-    ? 'Carregando plugins do workspace…'
+    ? 'Loading workspace plugins…'
     : pluginsQuery.isError
-      ? 'Falha ao carregar plugins do workspace.'
+      ? 'Failed to load workspace plugins.'
       : !hasAclPluginAvailableInWorkspace
-        ? 'Este recurso só pode ser usado quando o plugin ACL estiver habilitado neste workspace e instalado em rota, service, consumer ou como global.'
+        ? 'This feature can only be used when the ACL plugin is enabled in this workspace and installed on a route, service, consumer, or as global.'
         : null;
 
   const consumerIdFromQuery = searchParams.get('consumerId') ?? '';
@@ -131,7 +132,7 @@ export default function AclNewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New ACL</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie um grupo ACL para um consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create an ACL group for a consumer.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/acls`}
@@ -182,7 +183,9 @@ export default function AclNewPage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+            <span className="text-sm text-zinc-700">
+              Tags <HelpHint text="Optional comma-separated tags for this ACL." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={tags}
@@ -194,20 +197,20 @@ export default function AclNewPage() {
           <div className="sm:col-span-2">
             {aclBlockedReason ? (
               <div className="mb-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-                <div className="font-medium">Ação bloqueada</div>
+                <div className="font-medium">Action blocked</div>
                 <div className="mt-1">{aclBlockedReason}</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
                     href={`/w/${params.workspaceId}/gateway/plugins/new`}
                     className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
                   >
-                    Instalar plugin
+                    Install plugin
                   </Link>
                   <Link
                     href={`/w/${params.workspaceId}/gateway/consumers/${encodeURIComponent(selectedConsumerId)}`}
                     className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
                   >
-                    Voltar ao consumer
+                    Back to consumer
                   </Link>
                 </div>
               </div>
@@ -221,7 +224,7 @@ export default function AclNewPage() {
               {createAclMutation.isPending ? 'Creating…' : 'Create ACL'}
             </button>
             {createAclMutation.isError ? (
-              <div className="mt-2 text-sm text-red-700">Falha ao criar ACL.</div>
+              <div className="mt-2 text-sm text-red-700">Failed to create ACL.</div>
             ) : null}
           </div>
         </form>

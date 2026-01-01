@@ -41,7 +41,7 @@ export default function ConsumersPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Consumers</h1>
-          <p className="mt-1 text-sm text-zinc-600">Identidades de clientes (consumidores).</p>
+          <p className="mt-1 text-sm text-zinc-600">Client identities (consumers).</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/consumers/new`}
@@ -66,14 +66,14 @@ export default function ConsumersPage() {
               {consumersQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {consumersQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar consumers.
+                    Failed to load consumers.
                   </td>
                 </tr>
               ) : null}
@@ -105,7 +105,7 @@ export default function ConsumersPage() {
               {consumersQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhum consumer ainda.
+                    No consumers yet.
                   </td>
                 </tr>
               ) : null}

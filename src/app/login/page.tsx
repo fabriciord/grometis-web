@@ -34,7 +34,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-sm">
         <h1 className="text-xl font-semibold text-zinc-900">Login (dev)</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Autenticação temporária. Depois trocamos por Keycloak.
+          Temporary authentication. We will switch to Keycloak later.
         </p>
 
         <form
@@ -50,7 +50,7 @@ export default function LoginPage() {
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-zinc-900 placeholder:text-zinc-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="voce@empresa.com"
+              placeholder="you@company.com"
               required
               type="email"
               autoComplete="email"
@@ -58,19 +58,19 @@ export default function LoginPage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Nome (opcional)</span>
+            <span className="text-sm text-zinc-700">Name</span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-zinc-900 placeholder:text-zinc-400"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Seu nome"
+              placeholder="Your name"
               type="text"
             />
           </label>
 
           {loginMutation.isError ? (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-              Falha no login.
+              Login failed.
             </div>
           ) : null}
 
@@ -79,7 +79,7 @@ export default function LoginPage() {
             disabled={loginMutation.isPending}
             type="submit"
           >
-            {loginMutation.isPending ? 'Entrando…' : 'Entrar'}
+            {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
       </div>

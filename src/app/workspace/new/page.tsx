@@ -8,7 +8,7 @@ import { apiFetch, type ApiError } from '@/lib/api';
 import { clearAccessToken, getAccessToken } from '@/lib/auth';
 
 function formatApiError(err: unknown): string {
-  if (!err || typeof err !== 'object') return 'Erro desconhecido.';
+  if (!err || typeof err !== 'object') return 'Unknown error.';
   const apiErr = err as Partial<ApiError>;
   const status = typeof apiErr.status === 'number' ? apiErr.status : undefined;
   const raw = typeof apiErr.message === 'string' ? apiErr.message : '';
@@ -26,7 +26,7 @@ function formatApiError(err: unknown): string {
       return status ? `${status}: ${raw}` : raw;
     }
   }
-  return status ? `${status}: Falha ao criar workspace.` : 'Falha ao criar workspace.';
+  return status ? `${status}: Failed to create workspace.` : 'Failed to create workspace.';
 }
 
 type AvatarColor =
@@ -228,7 +228,7 @@ export default function CreateWorkspacePage() {
                     if (!file) return;
 
                     if (file.size > 1_000_000) {
-                      setFileError('Imagem excede 1MB.');
+                      setFileError('Image exceeds 1MB.');
                       setAvatarImageDataUrl(null);
                       setAvatarImageName('');
                       return;
@@ -240,7 +240,7 @@ export default function CreateWorkspacePage() {
                     const dataUrl = await new Promise<string>((resolve, reject) => {
                       const reader = new FileReader();
                       reader.onload = () => resolve(String(reader.result ?? ''));
-                      reader.onerror = () => reject(new Error('Falha ao ler arquivo'));
+                      reader.onerror = () => reject(new Error('Failed to read file'));
                       reader.readAsDataURL(file);
                     });
 

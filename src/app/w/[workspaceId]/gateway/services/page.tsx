@@ -133,13 +133,13 @@ export default function ServicesPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={serviceToDelete !== null}
-        title="Excluir service?"
+        title="Delete service?"
         description={
-          serviceToDelete ? `Excluir o service "${serviceToDelete.name}"? Essa ação não pode ser desfeita.` : undefined
+          serviceToDelete ? `Delete service "${serviceToDelete.name}"? This action cannot be undone.` : undefined
         }
         tone="danger"
-        confirmLabel={deleteServiceMutation.isPending ? 'Excluindo…' : 'Excluir'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteServiceMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteServiceMutation.isPending}
         onCancel={() => setServiceToDelete(null)}
         onConfirm={() => {
@@ -152,7 +152,7 @@ export default function ServicesPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Services</h1>
-          <p className="mt-1 text-sm text-zinc-600">Defina para onde o gateway encaminha as requisições.</p>
+          <p className="mt-1 text-sm text-zinc-600">Define where the gateway forwards requests.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/services/new`}
@@ -177,14 +177,14 @@ export default function ServicesPage() {
               {servicesQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {servicesQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar services.
+                    Failed to load services.
                   </td>
                 </tr>
               ) : null}
@@ -221,11 +221,11 @@ export default function ServicesPage() {
                         }
                         title={
                           !canManage
-                            ? 'Você não tem permissão para excluir services.'
+                            ? 'You do not have permission to delete services.'
                             : (routeCountByService.get(s.id) ?? 0) > 0
-                              ? 'Remova as routes do service antes de excluir.'
+                              ? 'Remove the routes from this service before deleting.'
                               : (pluginCountByService.get(s.id) ?? 0) > 0
-                                ? 'Remova os plugins do service antes de excluir.'
+                                ? 'Remove the plugins from this service before deleting.'
                                 : undefined
                         }
                         onClick={() => {
@@ -245,7 +245,7 @@ export default function ServicesPage() {
               {servicesQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhum service ainda.
+                    No services yet.
                   </td>
                 </tr>
               ) : null}

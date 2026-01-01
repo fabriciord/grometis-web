@@ -101,7 +101,7 @@ export default function RouteConfigPage() {
               {route.methods.join(', ')} · {route.paths.join(', ')}
             </div>
           ) : (
-            <div className="mt-2 text-sm text-zinc-600">Carregando…</div>
+            <div className="mt-2 text-sm text-zinc-600">Loading…</div>
           )}
         </div>
 
@@ -127,13 +127,13 @@ export default function RouteConfigPage() {
             href={`/w/${params.workspaceId}/gateway/routes/${params.routeId}`}
             className="text-sm text-zinc-700 hover:underline"
           >
-            Voltar para Route
+            Back to Route
           </Link>
         </div>
         <div className="border-t border-zinc-200" />
 
-        {routeQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Carregando…</div> : null}
-        {routeQuery.isError ? <div className="p-4 text-sm text-red-700">Falha ao carregar route.</div> : null}
+        {routeQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Loading…</div> : null}
+        {routeQuery.isError ? <div className="p-4 text-sm text-red-700">Failed to load route.</div> : null}
 
         {!routeQuery.isLoading && !routeQuery.isError ? (
           <div className="p-4">

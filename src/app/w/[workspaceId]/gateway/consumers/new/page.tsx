@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
+import { HelpHint } from '@/app/_components/HelpHint';
 
 function splitCsv(value: string): string[] {
   return value
@@ -56,7 +57,7 @@ export default function ConsumerNewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New consumer</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie uma identidade de consumidor.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a consumer identity.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/consumers`}
@@ -99,7 +100,9 @@ export default function ConsumerNewPage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+            <span className="text-sm text-zinc-700">
+              Tags <HelpHint text="Optional comma-separated tags for this consumer." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={tags}
@@ -113,13 +116,13 @@ export default function ConsumerNewPage() {
             disabled={createConsumerMutation.isPending}
             type="submit"
           >
-            {createConsumerMutation.isPending ? 'Criando…' : 'Criar'}
+            {createConsumerMutation.isPending ? 'Creating…' : 'Create consumer'}
           </button>
         </form>
 
         {createConsumerMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao criar consumer (precisa ser admin/owner).
+            Failed to create consumer (must be admin/owner).
           </div>
         ) : null}
       </div>

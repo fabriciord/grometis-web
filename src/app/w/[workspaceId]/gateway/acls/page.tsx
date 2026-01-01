@@ -80,7 +80,7 @@ export default function AclsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">ACLs</h1>
-          <p className="mt-1 text-sm text-zinc-600">Grupos ACL associados a um consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">ACL groups associated with a consumer.</p>
         </div>
         {canCreateAcl ? (
           <Link
@@ -95,10 +95,10 @@ export default function AclsPage() {
             disabled
             title={
               pluginsQuery.isLoading
-                ? 'Carregando plugins do workspace…'
+                ? 'Loading workspace plugins…'
                 : pluginsQuery.isError
-                  ? 'Falha ao carregar plugins do workspace.'
-                  : 'Instale o plugin ACL em rota, service, consumer ou como global neste workspace para habilitar ACLs.'
+                  ? 'Failed to load workspace plugins.'
+                  : 'Install the ACL plugin on a route, service, consumer, or as global in this workspace to enable ACLs.'
             }
             className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -122,14 +122,14 @@ export default function AclsPage() {
               {aclsQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {aclsQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar ACLs.
+                    Failed to load ACLs.
                   </td>
                 </tr>
               ) : null}
@@ -161,7 +161,7 @@ export default function AclsPage() {
               {aclsQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhuma ACL ainda.
+                    No ACLs yet.
                   </td>
                 </tr>
               ) : null}

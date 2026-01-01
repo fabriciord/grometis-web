@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
+import { HelpHint } from '@/app/_components/HelpHint';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -117,11 +118,11 @@ export default function KeyauthEditPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={isDeleteOpen}
-        title="Deletar credencial KeyAuth?"
-        description="Deletar esta credencial KeyAuth? Essa ação não pode ser desfeita."
+        title="Delete KeyAuth credential?"
+        description="Delete this KeyAuth credential? This action cannot be undone."
         tone="danger"
-        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteMutation.isPending}
         onCancel={() => setIsDeleteOpen(false)}
         onConfirm={() => {
@@ -133,7 +134,7 @@ export default function KeyauthEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit KeyAuth</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize key/ttl/tags.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update key/ttl/tags.</p>
         </div>
         <Link
           href={
@@ -148,8 +149,8 @@ export default function KeyauthEditPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {keyauthQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {keyauthQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {keyauthQuery.data ? (
           <form
@@ -173,7 +174,7 @@ export default function KeyauthEditPage() {
             </label>
 
             <label className="block">
-              <span className="text-sm text-zinc-700">TTL (segundos)</span>
+              <span className="text-sm text-zinc-700">TTL (seconds)</span>
               <input
                 className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
                 value={ttl}
@@ -202,7 +203,10 @@ export default function KeyauthEditPage() {
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-zinc-700">Tags</span>
+                <HelpHint text="Optional. Comma-separated values." />
+              </div>
               <input
                 className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
                 value={tags}
@@ -231,10 +235,10 @@ export default function KeyauthEditPage() {
               </button>
 
               {updateMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao salvar.</div>
+                <div className="text-sm text-red-700">Failed to save.</div>
               ) : null}
               {deleteMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao deletar.</div>
+                <div className="text-sm text-red-700">Failed to delete.</div>
               ) : null}
             </div>
           </form>

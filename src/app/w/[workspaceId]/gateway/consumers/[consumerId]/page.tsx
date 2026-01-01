@@ -190,9 +190,9 @@ export default function ConsumerViewPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white">
-        {consumerQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Carregando…</div> : null}
+        {consumerQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Loading…</div> : null}
         {consumerQuery.isError ? (
-          <div className="p-4 text-sm text-red-700">Falha ao carregar consumer.</div>
+          <div className="p-4 text-sm text-red-700">Failed to load consumer.</div>
         ) : null}
 
         {consumer ? (
@@ -234,7 +234,7 @@ export default function ConsumerViewPage() {
           <div className="flex items-start justify-between gap-4 border-b border-zinc-200 p-4">
             <div className="min-w-0">
               <div className="text-sm font-semibold text-zinc-900">ACLs</div>
-              <div className="mt-1 text-sm text-zinc-600">Grupos ACL vinculados a este consumer.</div>
+              <div className="mt-1 text-sm text-zinc-600">ACL groups linked to this consumer.</div>
             </div>
             {canCreateAcl ? (
               <Link
@@ -251,10 +251,10 @@ export default function ConsumerViewPage() {
                 disabled
                 title={
                   pluginsQuery.isLoading
-                    ? 'Carregando plugins do workspace…'
+                    ? 'Loading workspace plugins…'
                     : pluginsQuery.isError
-                      ? 'Falha ao carregar plugins do workspace.'
-                      : 'Instale o plugin ACL em rota, service, consumer ou como global neste workspace para habilitar ACLs.'
+                      ? 'Failed to load workspace plugins.'
+                      : 'Install the ACL plugin on a route, service, consumer, or as global in this workspace to enable ACLs.'
                 }
                 className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -264,9 +264,9 @@ export default function ConsumerViewPage() {
           </div>
 
           <div className="p-4">
-            {aclsQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
+            {aclsQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
             {aclsQuery.isError ? (
-              <div className="text-sm text-red-700">Falha ao carregar ACLs.</div>
+              <div className="text-sm text-red-700">Failed to load ACLs.</div>
             ) : null}
 
             <div className="overflow-x-auto">
@@ -308,7 +308,7 @@ export default function ConsumerViewPage() {
             </div>
 
             {aclsQuery.data?.length === 0 ? (
-              <div className="mt-3 text-sm text-zinc-600">Nenhum ACL para este consumer.</div>
+              <div className="mt-3 text-sm text-zinc-600">No ACLs for this consumer.</div>
             ) : null}
           </div>
         </div>
@@ -317,7 +317,7 @@ export default function ConsumerViewPage() {
           <div className="flex items-start justify-between gap-4 border-b border-zinc-200 p-4">
             <div className="min-w-0">
               <div className="text-sm font-semibold text-zinc-900">KeyAuth</div>
-              <div className="mt-1 text-sm text-zinc-600">Credenciais KeyAuth vinculadas a este consumer.</div>
+              <div className="mt-1 text-sm text-zinc-600">KeyAuth credentials linked to this consumer.</div>
             </div>
             {canCreateKeyauth ? (
               <Link
@@ -334,12 +334,12 @@ export default function ConsumerViewPage() {
                 disabled
                 title={
                   pluginsQuery.isLoading
-                    ? 'Carregando plugins do workspace…'
+                    ? 'Loading workspace plugins…'
                     : pluginsQuery.isError
-                      ? 'Falha ao carregar plugins do workspace.'
+                      ? 'Failed to load workspace plugins.'
                       : hasKeyauthPluginAnywhere
-                        ? 'O plugin KeyAuth está habilitado, mas não está instalado em rota nem service. Instale-o em uma rota ou service (ou deixe como global) para habilitar KeyAuth.'
-                        : 'Instale o plugin KeyAuth em uma rota, service ou como global para habilitar KeyAuth.'
+                        ? 'The KeyAuth plugin is enabled, but is not installed on a route or service. Install it on a route or service (or set it as global) to enable KeyAuth.'
+                        : 'Install the KeyAuth plugin on a route, service, or as global to enable KeyAuth.'
                 }
                 className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -349,9 +349,9 @@ export default function ConsumerViewPage() {
           </div>
 
           <div className="p-4">
-            {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
+            {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
             {keyauthQuery.isError ? (
-              <div className="text-sm text-red-700">Falha ao carregar KeyAuth.</div>
+              <div className="text-sm text-red-700">Failed to load KeyAuth.</div>
             ) : null}
 
             <div className="overflow-x-auto">
@@ -395,7 +395,7 @@ export default function ConsumerViewPage() {
             </div>
 
             {keyauthQuery.data?.length === 0 ? (
-              <div className="mt-3 text-sm text-zinc-600">Nenhuma credencial KeyAuth para este consumer.</div>
+              <div className="mt-3 text-sm text-zinc-600">No KeyAuth credentials for this consumer.</div>
             ) : null}
           </div>
         </div>

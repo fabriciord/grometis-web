@@ -38,15 +38,15 @@ type Timeframe = '1h' | '6h' | '12h' | '24h' | '7d';
 function timeframeLabel(tf: Timeframe) {
   switch (tf) {
     case '1h':
-      return 'Última 1 hora';
+      return 'Last 1 Hour';
     case '6h':
-      return 'Últimas 6 horas';
+      return 'Last 6 Hours';
     case '12h':
-      return 'Últimas 12 horas';
+      return 'Last 12 Hours';
     case '24h':
-      return 'Últimas 24 horas';
+      return 'Last 24 Hours';
     case '7d':
-      return 'Últimos 7 dias';
+      return 'Last 7 Days';
   }
 }
 
@@ -222,7 +222,7 @@ export default function RouteViewPage() {
               {route.methods.join(', ')} · {route.paths.join(', ')}
             </div>
           ) : (
-            <div className="mt-2 text-sm text-zinc-600">Carregando…</div>
+            <div className="mt-2 text-sm text-zinc-600">Loading…</div>
           )}
         </div>
 
@@ -271,8 +271,8 @@ export default function RouteViewPage() {
           </div>
         </div>
 
-        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Carregando…</div> : null}
-        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Loading…</div> : null}
+        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Failed to load.</div> : null}
 
         {!activitiesQuery.isLoading && !activitiesQuery.isError ? (
           <div className="mt-4">
@@ -284,7 +284,7 @@ export default function RouteViewPage() {
             <div className="mt-2 space-y-2">
               {statusCodes.rows.length === 0 ? (
                 <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
-                  Nenhuma activity no período.
+                  No activity in timeframe.
                 </div>
               ) : null}
 
@@ -323,8 +323,8 @@ export default function RouteViewPage() {
         <div className="px-4 py-2 text-xs font-medium text-zinc-500">Plugin</div>
         <div className="border-t border-zinc-200" />
         <div className="divide-y divide-zinc-200">
-          {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-          {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+          {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+          {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
           {!pluginsQuery.isLoading && !pluginsQuery.isError && plugins.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-zinc-600">No Plugins</div>
           ) : null}

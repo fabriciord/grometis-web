@@ -108,13 +108,13 @@ export default function RoutesPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={routeToDelete !== null}
-        title="Excluir route?"
+        title="Delete route?"
         description={
-          routeToDelete ? `Excluir a route "${routeToDelete.label}"? Essa ação não pode ser desfeita.` : undefined
+          routeToDelete ? `Delete route "${routeToDelete.label}"? This action cannot be undone.` : undefined
         }
         tone="danger"
-        confirmLabel={deleteRouteMutation.isPending ? 'Excluindo…' : 'Excluir'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteRouteMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteRouteMutation.isPending}
         onCancel={() => setRouteToDelete(null)}
         onConfirm={() => {
@@ -127,7 +127,7 @@ export default function RoutesPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Routes</h1>
-          <p className="mt-1 text-sm text-zinc-600">Regras de roteamento (paths, methods, protocols).</p>
+          <p className="mt-1 text-sm text-zinc-600">Routing rules (paths, methods, protocols).</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/routes/new`}
@@ -152,14 +152,14 @@ export default function RoutesPage() {
               {routesQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {routesQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar routes.
+                    Failed to load routes.
                   </td>
                 </tr>
               ) : null}
@@ -195,9 +195,9 @@ export default function RoutesPage() {
                         }
                         title={
                           !canManage
-                            ? 'Você não tem permissão para excluir routes.'
+                            ? 'You do not have permission to delete routes.'
                             : (pluginCountByRoute.get(r.id) ?? 0) > 0
-                              ? 'Remova os plugins da route antes de excluir.'
+                              ? 'Remove the plugins from this route before deleting.'
                               : undefined
                         }
                         onClick={() => {
@@ -218,7 +218,7 @@ export default function RoutesPage() {
               {routesQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhuma route ainda.
+                    No routes yet.
                   </td>
                 </tr>
               ) : null}

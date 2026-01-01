@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
+import { HelpHint } from '@/app/_components/HelpHint';
 
 export default function NewServicePage() {
   const params = useParams<{ workspaceId: string }>();
@@ -76,7 +77,7 @@ export default function NewServicePage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New Service</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie um service (upstream) para o gateway.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a service (upstream) for the gateway.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/services`}
@@ -135,7 +136,7 @@ export default function NewServicePage() {
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={host}
               onChange={(e) => setHost(e.target.value)}
-              placeholder="api.minhaempresa.com"
+              placeholder="api.mycompany.com"
               minLength={1}
               required
             />
@@ -154,7 +155,9 @@ export default function NewServicePage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">TTL (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              TTL <HelpHint text="Optional service TTL (seconds)." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={ttl}
@@ -166,7 +169,9 @@ export default function NewServicePage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Path (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              Path <HelpHint text="Optional base path to prepend to the upstream request." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={path}
@@ -176,7 +181,9 @@ export default function NewServicePage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Tags (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              Tags <HelpHint text="Optional comma-separated tags for this service." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={tags}
@@ -240,7 +247,7 @@ export default function NewServicePage() {
 
         {createServiceMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao criar service (precisa ser admin/owner).
+            Failed to create service (must be admin/owner).
           </div>
         ) : null}
       </div>

@@ -66,7 +66,7 @@ export default function SchemaEditPage() {
       setSchemaError(null);
       const parsed = safeJsonParse(schemaText);
       if (!parsed.ok) {
-        setSchemaError('Schema JSON inválido (precisa ser um objeto).');
+        setSchemaError('Invalid schema JSON (must be an object).');
         throw { status: 400, message: 'Invalid schema JSON' } satisfies ApiError;
       }
 
@@ -100,11 +100,11 @@ export default function SchemaEditPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={isDeleteOpen}
-        title="Deletar schema?"
-        description="Deletar este schema? Essa ação não pode ser desfeita."
+        title="Delete schema?"
+        description="Delete this schema? This action cannot be undone."
         tone="danger"
-        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteMutation.isPending}
         onCancel={() => setIsDeleteOpen(false)}
         onConfirm={() => {
@@ -116,7 +116,7 @@ export default function SchemaEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit schema</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize o nome e o JSON.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update the name and JSON.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/schemas/${params.schemaId}`}
@@ -127,8 +127,8 @@ export default function SchemaEditPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {schemaQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {schemaQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {schemaQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {schemaQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {schemaQuery.data ? (
           <form
@@ -181,10 +181,10 @@ export default function SchemaEditPage() {
               </button>
 
               {updateMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao salvar.</div>
+                <div className="text-sm text-red-700">Failed to save.</div>
               ) : null}
               {deleteMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao deletar.</div>
+                <div className="text-sm text-red-700">Failed to delete.</div>
               ) : null}
             </div>
           </form>

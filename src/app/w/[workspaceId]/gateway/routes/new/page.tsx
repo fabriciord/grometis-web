@@ -3,13 +3,19 @@
 import Link from 'next/link';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
+import { HelpHint } from '@/app/_components/HelpHint';
 
 type ServiceListItem = {
   id: string;
   name: string;
+};
+
+type PathItem = {
+  id: string;
+  value: string;
 };
 
 function splitList(value: string): string[] {
@@ -28,11 +34,18 @@ export default function NewRoutePage() {
   const [serviceId, setServiceId] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [paths, setPaths] = useState('/');
+  const nextPathIdRef = useRef(1);
+  const [paths, setPaths] = useState<PathItem[]>([]);
   const [methods, setMethods] = useState('GET,POST');
   const [protocols, setProtocols] = useState('http,https');
   const [host, setHost] = useState('');
   const [stripPath, setStripPath] = useState<boolean>(true);
+  const [pathsTouched, setPathsTouched] = useState(false);
+
+  const normalizedPaths = useMemo(
+    () => paths.map((p) => p.value.trim()).filter(Boolean),
+    [paths],
+  );
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -65,7 +78,9 @@ export default function NewRoutePage() {
           serviceId: selectedServiceId,
           name: name.trim() ? name : undefined,
           description: description.trim() ? description : undefined,
-          paths: splitList(paths),
+          paths: paths
+            .map((p) => p.value.trim())
+            .filter(Boolean),
           methods: splitList(methods),
           protocols: splitList(protocols),
           host: host.trim() ? host : undefined,
@@ -83,7 +98,7 @@ export default function NewRoutePage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New Route</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie uma regra de roteamento.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a routing rule.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/routes`}
@@ -98,6 +113,10 @@ export default function NewRoutePage() {
           className="grid gap-2 sm:grid-cols-2"
           onSubmit={(e) => {
             e.preventDefault();
+
+            setPathsTouched(true);
+            if (normalizedPaths.length === 0) return;
+
             createRouteMutation.mutate();
           }}
         >
@@ -118,28 +137,106 @@ export default function NewRoutePage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Name (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              Name <HelpHint text="Optional name for this route." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="minha-route"
+              placeholder="my-route"
             />
           </label>
 
-          <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Paths (separados por vírgula)</span>
-            <input
-              className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
-              value={paths}
-              onChange={(e) => setPaths(e.target.value)}
-              placeholder="/v1,/v2"
-              required
-            />
-          </label>
+          <div className="block sm:col-span-2">
+            <span className="text-sm text-zinc-700">
+              Paths <HelpHint text="Add one or more paths that match this route." />
+            </span>
+
+            <div className="mt-2 space-y-2">
+              {paths.map((pathItem, index) => {
+                const inputId = `route-path-${pathItem.id}`;
+                return (
+                  <div key={pathItem.id} className="flex items-center gap-2">
+                    <label className="sr-only" htmlFor={inputId}>
+                      Path {index + 1}
+                    </label>
+                    <input
+                      id={inputId}
+                      className="flex-1 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
+                      value={pathItem.value}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setPathsTouched(true);
+                        setPaths((prev) =>
+                          prev.map((p) =>
+                            p.id === pathItem.id ? { ...p, value: nextValue } : p,
+                          ),
+                        );
+                      }}
+                      placeholder="/v1/users"
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+
+                    {paths.length > 0 ? (
+                      <button
+                        type="button"
+                        aria-label="Remove path"
+                        onClick={() => {
+                          setPathsTouched(true);
+                          setPaths((prev) => prev.filter((p) => p.id !== pathItem.id));
+                        }}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M8 6V4h8v2" />
+                          <path d="M19 6l-1 14H6L5 6" />
+                          <path d="M10 11v6" />
+                          <path d="M14 11v6" />
+                        </svg>
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })}
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPathsTouched(true);
+                    setPaths((prev) => [
+                      ...prev,
+                      { id: String(nextPathIdRef.current++), value: '' },
+                    ]);
+                  }}
+                  className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
+                >
+                  + Add Path
+                </button>
+              </div>
+
+              {pathsTouched && paths.length === 0 ? (
+                <div className="text-sm text-red-600">Add at least one path.</div>
+              ) : null}
+            </div>
+          </div>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Methods (vírgula)</span>
+            <span className="text-sm text-zinc-700">
+              Methods{' '}
+              <HelpHint text="A list of HTTP methods that match this route, separated by commas." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={methods}
@@ -150,7 +247,9 @@ export default function NewRoutePage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Protocols (vírgula)</span>
+            <span className="text-sm text-zinc-700">
+              Protocols <HelpHint text="Comma-separated list of protocols allowed by this route." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={protocols}
@@ -161,12 +260,14 @@ export default function NewRoutePage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Host (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              Host <HelpHint text="Optional host that must match this route (e.g. api.mycompany.com)." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={host}
               onChange={(e) => setHost(e.target.value)}
-              placeholder="api.minhaempresa.com"
+              placeholder="api.mycompany.com"
             />
           </label>
 
@@ -176,7 +277,9 @@ export default function NewRoutePage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Description (opcional)</span>
+            <span className="text-sm text-zinc-700">
+              Description <HelpHint text="Optional description for this route." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={description}
@@ -187,7 +290,12 @@ export default function NewRoutePage() {
 
           <button
             className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-            disabled={createRouteMutation.isPending || servicesQuery.isLoading || !selectedServiceId}
+            disabled={
+              createRouteMutation.isPending ||
+              servicesQuery.isLoading ||
+              !selectedServiceId ||
+              normalizedPaths.length === 0
+            }
             type="submit"
           >
             {createRouteMutation.isPending ? 'Creating…' : 'Create route'}
@@ -196,13 +304,13 @@ export default function NewRoutePage() {
 
         {servicesQuery.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao carregar services (crie um service primeiro).
+            Failed to load services (create a service first).
           </div>
         ) : null}
 
         {createRouteMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao criar route (precisa ser admin/owner).
+            Failed to create route (must be admin/owner).
           </div>
         ) : null}
       </div>

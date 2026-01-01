@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/app/_components/ConfirmDialog';
+import { HelpHint } from '@/app/_components/HelpHint';
 import { apiFetch, type ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -106,11 +107,11 @@ export default function AclEditPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={isDeleteOpen}
-        title="Deletar ACL?"
-        description="Deletar esta ACL? Essa ação não pode ser desfeita."
+        title="Delete ACL?"
+        description="Delete this ACL? This action cannot be undone."
         tone="danger"
-        confirmLabel={deleteMutation.isPending ? 'Deletando…' : 'Deletar'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteMutation.isPending}
         onCancel={() => setIsDeleteOpen(false)}
         onConfirm={() => {
@@ -122,7 +123,7 @@ export default function AclEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit ACL</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize group/tags.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update group/tags.</p>
         </div>
         <Link
           href={
@@ -137,8 +138,8 @@ export default function AclEditPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {aclQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {aclQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {aclQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {aclQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {aclQuery.data ? (
           <form
@@ -181,7 +182,10 @@ export default function AclEditPage() {
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-zinc-700">Tags</span>
+                <HelpHint text="Optional. Comma-separated values." />
+              </div>
               <input
                 className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
                 value={tags}
@@ -210,10 +214,10 @@ export default function AclEditPage() {
               </button>
 
               {updateMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao salvar.</div>
+                <div className="text-sm text-red-700">Failed to save.</div>
               ) : null}
               {deleteMutation.isError ? (
-                <div className="text-sm text-red-700">Falha ao deletar.</div>
+                <div className="text-sm text-red-700">Failed to delete.</div>
               ) : null}
             </div>
           </form>

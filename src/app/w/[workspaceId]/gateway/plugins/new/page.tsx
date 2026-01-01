@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
+import { HelpHint } from '@/app/_components/HelpHint';
 
 type ServiceListItem = { id: string; name: string };
 
@@ -362,7 +363,7 @@ function PluginSchemaConfigPanel({
   if (!configFields.length) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-600">
-        Schema disponível, mas não foi possível extrair os campos de `config`.
+        Schema is available, but we could not extract the `config` fields.
       </div>
     );
   }
@@ -515,7 +516,7 @@ export default function PluginNewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New plugin</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie um plugin para Service/Route/Consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a plugin for Service/Route/Consumer.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/plugins`}
@@ -542,7 +543,7 @@ export default function PluginNewPage() {
                 required
               >
                 <option value="" disabled>
-                  Selecione…
+                  Select…
                 </option>
                 {(schemasQuery.data ?? [])
                   .slice()
@@ -572,7 +573,7 @@ export default function PluginNewPage() {
                 />
                 <div>
                   <div className="text-sm text-zinc-900">Global</div>
-                  <div className="text-xs text-zinc-500">Todos services, routes e consumers</div>
+                    <div className="text-xs text-zinc-500">All services, routes and consumers</div>
                 </div>
               </label>
               <label className="flex items-start gap-2">
@@ -584,7 +585,7 @@ export default function PluginNewPage() {
                 />
                 <div>
                   <div className="text-sm text-zinc-900">Scoped</div>
-                  <div className="text-xs text-zinc-500">Selecione um service, route ou consumer</div>
+                    <div className="text-xs text-zinc-500">Select a service, route or consumer</div>
                 </div>
               </label>
             </div>
@@ -655,7 +656,9 @@ export default function PluginNewPage() {
           ) : null}
 
           <label className="block">
-            <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+            <span className="text-sm text-zinc-700">
+              Tags <HelpHint text="Optional comma-separated tags for this plugin." />
+            </span>
             <input
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400"
               value={tags}
@@ -668,7 +671,7 @@ export default function PluginNewPage() {
             {pluginSchemaQuery.data ? (
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <div className="text-sm font-semibold text-zinc-900">Config</div>
-                <div className="mt-1 text-xs text-zinc-600">Preencha os campos com base no schema do plugin.</div>
+                <div className="mt-1 text-xs text-zinc-600">Fill in the fields based on the plugin schema.</div>
 
                 <div className="mt-3">
                   <PluginSchemaConfigPanel
@@ -680,7 +683,7 @@ export default function PluginNewPage() {
               </div>
             ) : (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                Selecione um plugin para carregar o schema.
+                Select a plugin to load the schema.
               </div>
             )}
           </div>
@@ -696,27 +699,27 @@ export default function PluginNewPage() {
             }
             type="submit"
           >
-            {createPluginMutation.isPending ? 'Criando…' : 'Criar'}
+            {createPluginMutation.isPending ? 'Creating…' : 'Create plugin'}
           </button>
         </form>
 
         {isScoped && !hasScopeSelection ? (
           <div className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
-            Se Scope=Scoped, selecione um Service, Route ou Consumer.
+            If Scope=Scoped, select a Service, Route or Consumer.
           </div>
         ) : null}
 
         {createPluginMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao criar plugin (precisa ser admin/owner).
+            Failed to create plugin (must be admin/owner).
           </div>
         ) : null}
 
         {servicesQuery.isError ? (
-          <div className="mt-3 text-sm text-red-700">Falha ao carregar services.</div>
+          <div className="mt-3 text-sm text-red-700">Failed to load services.</div>
         ) : null}
         {routesQuery.isError ? (
-          <div className="mt-1 text-sm text-red-700">Falha ao carregar routes.</div>
+          <div className="mt-1 text-sm text-red-700">Failed to load routes.</div>
         ) : null}
       </div>
     </div>

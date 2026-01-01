@@ -74,7 +74,7 @@ export default function ServiceConfigPage() {
               {service.path ? service.path : ''}
             </div>
           ) : (
-            <div className="mt-2 text-sm text-zinc-600">Carregando…</div>
+            <div className="mt-2 text-sm text-zinc-600">Loading…</div>
           )}
         </div>
 
@@ -100,14 +100,14 @@ export default function ServiceConfigPage() {
             href={`/w/${params.workspaceId}/gateway/services/${params.serviceId}`}
             className="text-sm text-zinc-700 hover:underline"
           >
-            Voltar para Service
+            Back to Service
           </Link>
         </div>
         <div className="border-t border-zinc-200" />
 
-        {serviceQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Carregando…</div> : null}
+        {serviceQuery.isLoading ? <div className="p-4 text-sm text-zinc-600">Loading…</div> : null}
         {serviceQuery.isError ? (
-          <div className="p-4 text-sm text-red-700">Falha ao carregar service.</div>
+          <div className="p-4 text-sm text-red-700">Failed to load service.</div>
         ) : null}
 
         {!serviceQuery.isLoading && !serviceQuery.isError ? (

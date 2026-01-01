@@ -39,7 +39,7 @@ export default function SchemasPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Schemas</h1>
-          <p className="mt-1 text-sm text-zinc-600">Esquemas JSON usados para configuração/validação.</p>
+          <p className="mt-1 text-sm text-zinc-600">JSON schemas used for configuration/validation.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/schemas/new`}
@@ -62,14 +62,14 @@ export default function SchemasPage() {
               {schemasQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={2}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {schemasQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={2}>
-                    Falha ao carregar schemas.
+                    Failed to load schemas.
                   </td>
                 </tr>
               ) : null}
@@ -99,7 +99,7 @@ export default function SchemasPage() {
               {schemasQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={2}>
-                    Nenhum schema ainda.
+                    No schemas yet.
                   </td>
                 </tr>
               ) : null}

@@ -39,7 +39,7 @@ export default function SchemaNewPage() {
       setSchemaError(null);
       const parsed = safeJsonParse(schemaText);
       if (!parsed.ok) {
-        setSchemaError('Schema JSON inválido (precisa ser um objeto).');
+        setSchemaError('Invalid JSON schema (must be an object).');
         throw { status: 400, message: 'Invalid schema JSON' } satisfies ApiError;
       }
 
@@ -62,7 +62,7 @@ export default function SchemaNewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">New schema</h1>
-          <p className="mt-1 text-sm text-zinc-600">Crie um schema JSON.</p>
+          <p className="mt-1 text-sm text-zinc-600">Create a JSON schema.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/schemas`}
@@ -112,7 +112,7 @@ export default function SchemaNewPage() {
               {createMutation.isPending ? 'Creating…' : 'Create schema'}
             </button>
             {createMutation.isError ? (
-              <div className="mt-2 text-sm text-red-700">Falha ao criar schema.</div>
+              <div className="mt-2 text-sm text-red-700">Failed to create schema.</div>
             ) : null}
           </div>
         </form>

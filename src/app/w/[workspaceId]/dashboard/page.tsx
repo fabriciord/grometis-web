@@ -66,28 +66,20 @@ type ActivityListItem = {
   createdAt: string;
 };
 
-function statusBucket(statusCode: number) {
-  if (statusCode >= 200 && statusCode < 300) return '2xx';
-  if (statusCode >= 300 && statusCode < 400) return '3xx';
-  if (statusCode >= 400 && statusCode < 500) return '4xx';
-  if (statusCode >= 500 && statusCode < 600) return '5xx';
-  return 'other';
-}
-
 type Timeframe = '1h' | '6h' | '12h' | '24h' | '7d';
 
 function timeframeLabel(tf: Timeframe) {
   switch (tf) {
     case '1h':
-      return 'Última 1 hora';
+      return 'Last 1 Hour';
     case '6h':
-      return 'Últimas 6 horas';
+      return 'Last 6 Hours';
     case '12h':
-      return 'Últimas 12 horas';
+      return 'Last 12 Hours';
     case '24h':
-      return 'Últimas 24 horas';
+      return 'Last 24 Hours';
     case '7d':
-      return 'Últimos 7 dias';
+      return 'Last 7 Days';
   }
 }
 
@@ -294,20 +286,24 @@ export default function WorkspaceDashboardPage() {
   const canDeleteWorkspace = workspaceRole === 'owner' && isWorkspaceEmpty;
   const deleteWorkspaceHelp =
     workspaceRole !== 'owner'
-      ? 'Apenas o owner pode excluir o workspace.'
+      ? 'Only the owner can delete the workspace.'
       : !isWorkspaceEmpty
-        ? 'O workspace precisa estar vazio (sem services, routes, plugins, consumers e credenciais) para excluir.'
+        ? 'The workspace must be empty (no services, routes, plugins, consumers, or credentials) to be deleted.'
         : null;
 
-  const now = new Date();
-  const start = useMemo(() => startForTimeframe(now, timeframe), [now, timeframe]);
-  const bucketMinutes = bucketMinutesForTimeframe(timeframe);
+  const { now, start, bucketMinutes } = useMemo(() => {
+    const currentNow = new Date();
+    return {
+      now: currentNow,
+      start: startForTimeframe(currentNow, timeframe),
+      bucketMinutes: bucketMinutesForTimeframe(timeframe),
+    };
+  }, [timeframe]);
 
-  const activitiesAll = activitiesQuery.data ?? [];
-  const activities = useMemo(
-    () => activitiesAll.filter((a) => new Date(a.createdAt).getTime() >= start.getTime()),
-    [activitiesAll, start],
-  );
+  const activities = useMemo(() => {
+    const all = activitiesQuery.data ?? [];
+    return all.filter((a) => new Date(a.createdAt).getTime() >= start.getTime());
+  }, [activitiesQuery.data, start]);
 
   const { buckets, successSeries, errorSeries, bucketLabels } = useMemo(() => {
     const startBucket = clampDateToBucket(start, bucketMinutes);
@@ -369,11 +365,11 @@ export default function WorkspaceDashboardPage() {
     <div className="space-y-6">
       <ConfirmDialog
         open={isDeleteWorkspaceOpen}
-        title="Excluir workspace?"
-        description="Excluir este workspace? Essa ação não pode ser desfeita."
+        title="Delete workspace?"
+        description="Delete this workspace? This action cannot be undone."
         tone="danger"
-        confirmLabel={deleteWorkspaceMutation.isPending ? 'Excluindo…' : 'Excluir'}
-        cancelLabel="Cancelar"
+        confirmLabel={deleteWorkspaceMutation.isPending ? 'Deleting…' : 'Delete'}
+        cancelLabel="Cancel"
         busy={deleteWorkspaceMutation.isPending}
         onCancel={() => setIsDeleteWorkspaceOpen(false)}
         onConfirm={() => {
@@ -439,8 +435,8 @@ export default function WorkspaceDashboardPage() {
           </div>
         </div>
 
-        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Carregando…</div> : null}
-        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Loading…</div> : null}
+        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Failed to load.</div> : null}
 
         {!activitiesQuery.isLoading && !activitiesQuery.isError ? (
           <div className="mt-4">
@@ -525,10 +521,10 @@ export default function WorkspaceDashboardPage() {
           <div className="px-4 py-2 text-xs font-medium text-zinc-500">Service Name/ID</div>
           <div className="border-t border-zinc-200" />
           <div className="divide-y divide-zinc-200">
-            {servicesQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-            {servicesQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+            {servicesQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+            {servicesQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
             {!servicesQuery.isLoading && !servicesQuery.isError && servicesPreview.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-zinc-600">Nenhum service ainda.</div>
+              <div className="px-4 py-3 text-sm text-zinc-600">No services yet.</div>
             ) : null}
             {servicesPreview.map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
@@ -559,10 +555,10 @@ export default function WorkspaceDashboardPage() {
           <div className="px-4 py-2 text-xs font-medium text-zinc-500">Username/ID</div>
           <div className="border-t border-zinc-200" />
           <div className="divide-y divide-zinc-200">
-            {consumersQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-            {consumersQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+            {consumersQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+            {consumersQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
             {!consumersQuery.isLoading && !consumersQuery.isError && consumersPreview.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-zinc-600">Nenhum consumer ainda.</div>
+              <div className="px-4 py-3 text-sm text-zinc-600">No consumers yet.</div>
             ) : null}
             {consumersPreview.map((c) => (
               <div key={c.id} className="flex items-center justify-between gap-3 px-4 py-3">
@@ -598,10 +594,10 @@ export default function WorkspaceDashboardPage() {
           </div>
           <div className="border-t border-zinc-200" />
           <div className="divide-y divide-zinc-200">
-            {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-            {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+            {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+            {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
             {!pluginsQuery.isLoading && !pluginsQuery.isError && latestPlugins.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-zinc-600">Nenhum plugin ainda.</div>
+              <div className="px-4 py-3 text-sm text-zinc-600">No plugins yet.</div>
             ) : null}
             {latestPlugins.map((p) => (
               <div key={p.id} className="grid grid-cols-2 items-center gap-3 px-4 py-3">
@@ -625,7 +621,7 @@ export default function WorkspaceDashboardPage() {
           <div className="text-sm font-medium text-zinc-900">Developer Portal Summary</div>
           <div className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 p-6 text-center">
             <div className="text-sm font-medium text-zinc-900">Developer Portal is disabled</div>
-            <div className="mt-2 text-sm text-zinc-600">Enable Dev Portal para expor documentação de APIs.</div>
+            <div className="mt-2 text-sm text-zinc-600">Enable Dev Portal to expose API documentation.</div>
           </div>
         </div>
       </div>
@@ -642,10 +638,10 @@ export default function WorkspaceDashboardPage() {
               setIsDeleteWorkspaceOpen(true);
             }}
           >
-            {deleteWorkspaceMutation.isPending ? 'Excluindo…' : 'Delete Workspace'}
+            {deleteWorkspaceMutation.isPending ? 'Deleting…' : 'Delete Workspace'}
           </button>
           {deleteWorkspaceMutation.isError ? (
-            <div className="text-xs text-red-700">Falha ao excluir. Verifique se o workspace está vazio.</div>
+            <div className="text-xs text-red-700">Failed to delete. Make sure the workspace is empty.</div>
           ) : null}
         </div>
       </div>

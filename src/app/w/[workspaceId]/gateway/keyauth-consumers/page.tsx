@@ -42,7 +42,7 @@ export default function KeyauthConsumersPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">KeyAuth</h1>
-          <p className="mt-1 text-sm text-zinc-600">Chaves KeyAuth vinculadas a um consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">KeyAuth keys linked to a consumer.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/keyauth-consumers/new`}
@@ -67,14 +67,14 @@ export default function KeyauthConsumersPage() {
               {keyauthQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {keyauthQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar KeyAuth.
+                    Failed to load KeyAuth.
                   </td>
                 </tr>
               ) : null}
@@ -106,7 +106,7 @@ export default function KeyauthConsumersPage() {
               {keyauthQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhuma chave ainda.
+                    No keys yet.
                   </td>
                 </tr>
               ) : null}

@@ -67,8 +67,8 @@ export default function AclViewPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {aclQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {aclQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {aclQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {aclQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {acl ? (
           <dl className="grid gap-3 sm:grid-cols-2">

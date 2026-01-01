@@ -60,15 +60,15 @@ type Timeframe = '1h' | '6h' | '12h' | '24h' | '7d';
 function timeframeLabel(tf: Timeframe) {
   switch (tf) {
     case '1h':
-      return 'Última 1 hora';
+      return 'Last 1 Hour';
     case '6h':
-      return 'Últimas 6 horas';
+      return 'Last 6 Hours';
     case '12h':
-      return 'Últimas 12 horas';
+      return 'Last 12 Hours';
     case '24h':
-      return 'Últimas 24 horas';
+      return 'Last 24 Hours';
     case '7d':
-      return 'Últimos 7 dias';
+      return 'Last 7 Days';
   }
 }
 
@@ -238,7 +238,7 @@ export default function ServiceViewPage() {
               </span>
             </div>
           ) : (
-            <div className="mt-2 text-sm text-zinc-600">Carregando…</div>
+            <div className="mt-2 text-sm text-zinc-600">Loading…</div>
           )}
         </div>
 
@@ -259,7 +259,7 @@ export default function ServiceViewPage() {
           </div>
           {service?.updatedAt ? (
             <div className="text-xs text-zinc-500">
-              Atualizado em: {new Date(service.updatedAt).toLocaleString()}
+              Last Updated: {new Date(service.updatedAt).toLocaleString()}
             </div>
           ) : null}
         </div>
@@ -269,7 +269,7 @@ export default function ServiceViewPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-sm font-medium text-zinc-900">Status Codes</div>
-            <div className="mt-1 text-xs text-zinc-500">Total no período: {statusCodes.total.toLocaleString()}</div>
+              <div className="mt-1 text-xs text-zinc-500">Total in timeframe: {statusCodes.total.toLocaleString()}</div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -290,8 +290,8 @@ export default function ServiceViewPage() {
           </div>
         </div>
 
-        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Carregando…</div> : null}
-        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+        {activitiesQuery.isLoading ? <div className="mt-3 text-sm text-zinc-600">Loading…</div> : null}
+        {activitiesQuery.isError ? <div className="mt-3 text-sm text-red-700">Failed to load.</div> : null}
 
         {!activitiesQuery.isLoading && !activitiesQuery.isError ? (
           <div className="mt-4">
@@ -303,7 +303,7 @@ export default function ServiceViewPage() {
             <div className="mt-2 space-y-2">
               {statusCodes.rows.length === 0 ? (
                 <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
-                  Nenhuma activity no período.
+                  No activity in timeframe.
                 </div>
               ) : null}
 
@@ -334,7 +334,7 @@ export default function ServiceViewPage() {
             <div>
               <div className="text-sm font-medium text-zinc-900">Routes</div>
               <div className="mt-0.5 text-xs text-zinc-500">
-                {routesQuery.isLoading ? 'Carregando…' : `Total: ${(routesQuery.data ?? []).length.toLocaleString()}`}
+                {routesQuery.isLoading ? 'Loading…' : `Total: ${(routesQuery.data ?? []).length.toLocaleString()}`}
               </div>
             </div>
             <Link
@@ -351,12 +351,12 @@ export default function ServiceViewPage() {
           </div>
           <div className="border-t border-zinc-200" />
           <div className="divide-y divide-zinc-200">
-            {routesQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-            {routesQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+            {routesQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+            {routesQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
             {!routesQuery.isLoading && !routesQuery.isError && routes.length === 0 ? (
               <div className="px-4 py-6 text-center">
-                <div className="text-sm font-medium text-zinc-900">Nenhuma rota ainda</div>
-                <div className="mt-1 text-sm text-zinc-600">Crie a primeira rota para começar a rotear tráfego.</div>
+                <div className="text-sm font-medium text-zinc-900">No routes yet</div>
+                <div className="mt-1 text-sm text-zinc-600">Create your first route to start routing traffic.</div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/routes/new?serviceId=${params.serviceId}`}
                   className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
@@ -390,7 +390,7 @@ export default function ServiceViewPage() {
             <div>
               <div className="text-sm font-medium text-zinc-900">Plugins</div>
               <div className="mt-0.5 text-xs text-zinc-500">
-                {pluginsQuery.isLoading ? 'Carregando…' : `Total: ${(pluginsQuery.data ?? []).length.toLocaleString()}`}
+                {pluginsQuery.isLoading ? 'Loading…' : `Total: ${(pluginsQuery.data ?? []).length.toLocaleString()}`}
               </div>
             </div>
             <Link
@@ -404,12 +404,12 @@ export default function ServiceViewPage() {
           <div className="px-4 py-2 text-xs font-medium text-zinc-500">Plugin</div>
           <div className="border-t border-zinc-200" />
           <div className="divide-y divide-zinc-200">
-            {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Carregando…</div> : null}
-            {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Falha ao carregar.</div> : null}
+            {pluginsQuery.isLoading ? <div className="px-4 py-3 text-sm text-zinc-600">Loading…</div> : null}
+            {pluginsQuery.isError ? <div className="px-4 py-3 text-sm text-red-700">Failed to load.</div> : null}
             {!pluginsQuery.isLoading && !pluginsQuery.isError && plugins.length === 0 ? (
               <div className="px-4 py-6 text-center">
-                <div className="text-sm font-medium text-zinc-900">Nenhum plugin no service</div>
-                <div className="mt-1 text-sm text-zinc-600">Adicione plugins para aplicar políticas e transformações.</div>
+                <div className="text-sm font-medium text-zinc-900">No plugins on this service</div>
+                <div className="mt-1 text-sm text-zinc-600">Add plugins to apply policies and transformations.</div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/plugins/new?serviceId=${params.serviceId}`}
                   className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"

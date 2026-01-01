@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { HelpHint } from '@/app/_components/HelpHint';
 import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 
@@ -81,11 +82,11 @@ export default function ConsumerEditPage() {
   });
 
   if (consumerQuery.isLoading) {
-    return <div className="text-sm text-zinc-600">Carregando…</div>;
+    return <div className="text-sm text-zinc-600">Loading…</div>;
   }
 
   if (consumerQuery.isError || !consumer) {
-    return <div className="text-sm text-red-700">Falha ao carregar consumer.</div>;
+    return <div className="text-sm text-red-700">Failed to load consumer.</div>;
   }
 
   return (
@@ -93,7 +94,7 @@ export default function ConsumerEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="truncate text-xl font-semibold text-zinc-900">Edit consumer: {consumer.username}</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize os dados do consumer.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update consumer details.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/consumers/${params.consumerId}`}
@@ -134,12 +135,15 @@ export default function ConsumerEditPage() {
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-sm text-zinc-700">Tags (opcional, vírgula)</span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-zinc-700">Tags</span>
+              <HelpHint text="Optional. Comma-separated values." />
+            </div>
             <input
               ref={tagsRef}
               defaultValue={consumer.tags?.join(',') ?? ''}
               className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
-              placeholder="mobile,prod"
+              placeholder="mobile, prod"
             />
           </label>
 
@@ -148,13 +152,13 @@ export default function ConsumerEditPage() {
             disabled={updateConsumerMutation.isPending}
             type="submit"
           >
-            {updateConsumerMutation.isPending ? 'Salvando…' : 'Save'}
+            {updateConsumerMutation.isPending ? 'Saving…' : 'Save'}
           </button>
         </form>
 
         {updateConsumerMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao salvar (precisa ser admin/owner).
+            Failed to save (must be admin/owner).
           </div>
         ) : null}
       </div>

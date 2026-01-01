@@ -126,7 +126,7 @@ export default function ServiceEditPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Edit Service</h1>
-          <p className="mt-1 text-sm text-zinc-600">Atualize os campos do service.</p>
+          <p className="mt-1 text-sm text-zinc-600">Update service fields.</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -149,7 +149,7 @@ export default function ServiceEditPage() {
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
         {serviceQuery.isError ? (
           <div className="mb-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao carregar service.
+            Failed to load service.
           </div>
         ) : null}
 
@@ -297,7 +297,7 @@ export default function ServiceEditPage() {
 
         {updateMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao salvar (precisa ser admin/owner).
+            Failed to save (must be admin/owner).
           </div>
         ) : null}
       </div>

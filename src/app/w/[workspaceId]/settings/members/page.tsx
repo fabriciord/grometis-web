@@ -82,11 +82,11 @@ export default function MembersPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-xl font-semibold text-zinc-900">Members</h1>
-        <p className="mt-1 text-sm text-zinc-600">Gerencie membros e convites do workspace.</p>
+        <p className="mt-1 text-sm text-zinc-600">Manage workspace members and invitations.</p>
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        <h2 className="font-medium text-zinc-900">Convidar (sem SMTP por enquanto)</h2>
+        <h2 className="font-medium text-zinc-900">Invite (no SMTP yet)</h2>
         <form
           className="mt-3 grid gap-2 sm:grid-cols-3"
           onSubmit={(e) => {
@@ -99,7 +99,7 @@ export default function MembersPage() {
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
             type="email"
-            placeholder="email@empresa.com"
+            placeholder="email@company.com"
             required
           />
           <select
@@ -121,25 +121,25 @@ export default function MembersPage() {
             disabled={inviteMutation.isPending}
             type="submit"
           >
-            {inviteMutation.isPending ? 'Convidando…' : 'Gerar convite'}
+            {inviteMutation.isPending ? 'Inviting…' : 'Generate Invite'}
           </button>
         </form>
 
         {inviteMutation.isError ? (
           <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
-            Falha ao criar convite (precisa ser admin/owner).
+            Failed to create invite (requires admin/owner).
           </div>
         ) : null}
 
         {createdToken ? (
           <div className="mt-3 rounded-md bg-zinc-50 p-3 text-sm">
-            Token do convite (para teste): <span className="font-mono">{createdToken}</span>
+            Invite token (for testing): <span className="font-mono">{createdToken}</span>
           </div>
         ) : null}
       </div>
 
       <div>
-        <h2 className="font-medium text-zinc-900">Lista de membros</h2>
+        <h2 className="font-medium text-zinc-900">Member list</h2>
         <div className="mt-2 rounded-xl border border-zinc-200 bg-white">
           <div className="divide-y divide-zinc-200">
             {(membersQuery.data ?? []).map((m) => (
@@ -152,10 +152,10 @@ export default function MembersPage() {
               </div>
             ))}
             {membersQuery.isLoading ? (
-              <div className="p-4 text-sm text-zinc-600">Carregando…</div>
+              <div className="p-4 text-sm text-zinc-600">Loading…</div>
             ) : null}
             {membersQuery.data?.length === 0 ? (
-              <div className="p-4 text-sm text-zinc-600">Nenhum membro.</div>
+              <div className="p-4 text-sm text-zinc-600">No members.</div>
             ) : null}
           </div>
         </div>
@@ -172,15 +172,15 @@ export default function MembersPage() {
                   <div className="text-sm text-zinc-600">role: {i.role}</div>
                 </div>
                 <div className="text-sm text-zinc-600">
-                  {i.acceptedAt ? 'aceito' : 'pendente'}
+                  {i.acceptedAt ? 'accepted' : 'pending'}
                 </div>
               </div>
             ))}
             {invitesQuery.isLoading ? (
-              <div className="p-4 text-sm text-zinc-600">Carregando…</div>
+              <div className="p-4 text-sm text-zinc-600">Loading…</div>
             ) : null}
             {invitesQuery.data?.length === 0 ? (
-              <div className="p-4 text-sm text-zinc-600">Nenhum convite.</div>
+              <div className="p-4 text-sm text-zinc-600">No invites.</div>
             ) : null}
           </div>
         </div>

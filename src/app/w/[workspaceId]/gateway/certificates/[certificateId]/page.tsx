@@ -19,7 +19,7 @@ export default function CertificateViewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Certificate</h1>
-          <p className="mt-1 text-sm text-zinc-600">Ainda não implementado no backend.</p>
+          <p className="mt-1 text-sm text-zinc-600">Not implemented in the backend yet.</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -37,7 +37,7 @@ export default function CertificateViewPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-700">Em breve.</div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-700">Coming soon.</div>
     </div>
   );
 }

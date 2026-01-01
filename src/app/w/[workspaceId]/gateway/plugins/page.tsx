@@ -80,14 +80,14 @@ export default function PluginsPage() {
               {pluginsQuery.isLoading ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Carregando…
+                    Loading…
                   </td>
                 </tr>
               ) : null}
               {pluginsQuery.isError ? (
                 <tr>
                   <td className="px-4 py-3 text-red-700" colSpan={4}>
-                    Falha ao carregar plugins.
+                    Failed to load plugins.
                   </td>
                 </tr>
               ) : null}
@@ -120,7 +120,7 @@ export default function PluginsPage() {
               {pluginsQuery.data?.length === 0 ? (
                 <tr>
                   <td className="px-4 py-3 text-zinc-600" colSpan={4}>
-                    Nenhum plugin ainda.
+                    No plugins yet.
                   </td>
                 </tr>
               ) : null}

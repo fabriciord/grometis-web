@@ -62,8 +62,8 @@ export default function SchemaViewPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {schemaQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {schemaQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {schemaQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {schemaQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {s ? (
           <div className="space-y-4">

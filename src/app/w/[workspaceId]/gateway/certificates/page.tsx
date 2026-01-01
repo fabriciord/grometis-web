@@ -19,7 +19,7 @@ export default function CertificatesPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Certificates</h1>
-          <p className="mt-1 text-sm text-zinc-600">Ainda não implementado no backend.</p>
+          <p className="mt-1 text-sm text-zinc-600">Not implemented in the backend yet.</p>
         </div>
         <Link
           href={`/w/${params.workspaceId}/gateway/certificates/new`}
@@ -30,7 +30,7 @@ export default function CertificatesPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white">
-        <div className="p-4 text-sm text-zinc-700">Em breve.</div>
+        <div className="p-4 text-sm text-zinc-700">Coming soon.</div>
       </div>
     </div>
   );

@@ -68,8 +68,8 @@ export default function KeyauthViewPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Carregando…</div> : null}
-        {keyauthQuery.isError ? <div className="text-sm text-red-700">Falha ao carregar.</div> : null}
+        {keyauthQuery.isLoading ? <div className="text-sm text-zinc-600">Loading…</div> : null}
+        {keyauthQuery.isError ? <div className="text-sm text-red-700">Failed to load.</div> : null}
 
         {k ? (
           <dl className="grid gap-3 sm:grid-cols-2">
