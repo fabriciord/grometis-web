@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { apiFetch } from '@/lib/api';
 import { clearAccessToken, getAccessToken } from '@/lib/auth';
 
@@ -24,7 +24,6 @@ export default function WorkspaceLayout({
   const pathname = usePathname();
   const params = useParams<{ workspaceId: string }>();
   const token = useMemo(() => getAccessToken(), []);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const apiBaseUrlLabel = useMemo(() => {
     const raw = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -71,12 +70,12 @@ export default function WorkspaceLayout({
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <div className="flex min-h-screen">
         <aside
-          className={`${sidebarOpen ? 'flex' : 'hidden'} sticky top-0 h-screen w-64 shrink-0 flex-col overflow-y-auto bg-zinc-950 px-4 py-5 text-zinc-100`}
+          className="sticky top-0 h-screen w-64 shrink-0 flex flex-col overflow-y-auto bg-indigo-950 px-4 py-5 text-zinc-100"
         >
           <div>
             <Link
               href={`/w/${workspaceId}/dashboard`}
-              className="group flex w-full items-center justify-center rounded-lg px-2 py-2 hover:bg-zinc-900/60"
+              className="group flex w-full items-center justify-center rounded-lg px-2 py-2 hover:bg-indigo-900/60"
             >
               <div className="rounded-md bg-white px-2 py-1">
                 <Image
@@ -92,7 +91,7 @@ export default function WorkspaceLayout({
 
             <Link
               href="/workspace"
-              className="mt-3 inline-flex rounded-md border border-indigo-500/30 bg-indigo-600/10 px-2 py-1 text-xs font-medium text-indigo-100 hover:bg-indigo-600/20"
+              className="mt-3 inline-flex rounded-md border border-indigo-400/25 bg-indigo-600/10 px-2 py-1 text-xs font-medium text-indigo-100 hover:bg-indigo-600/20"
             >
               Trocar workspace
             </Link>
@@ -122,7 +121,7 @@ export default function WorkspaceLayout({
                   className={`block rounded-md px-3 py-2 text-sm ${
                     active
                       ? 'bg-indigo-600/20 text-white'
-                      : 'text-zinc-200 hover:bg-zinc-900/60 hover:text-white'
+                      : 'text-zinc-200 hover:bg-indigo-900/60 hover:text-white'
                   }`}
                 >
                   {item.label}
@@ -148,22 +147,7 @@ export default function WorkspaceLayout({
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
             <div className="flex w-full items-center justify-between px-6 py-3">
-              <div className="min-w-0 flex items-center gap-3">
-                <button
-                  type="button"
-                  aria-label={sidebarOpen ? 'Fechar menu' : 'Abrir menu'}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
-                  onClick={() => setSidebarOpen((v) => !v)}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                    <path
-                      d="M4 7h16M4 12h16M4 17h16"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
+              <div className="min-w-0 flex items-center">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-zinc-900">{workspaceName}</div>
                   <div className="text-xs text-zinc-500">Control plane</div>
