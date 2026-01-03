@@ -49,7 +49,7 @@ export function ConfirmDialog({
     }
 
     return {
-      confirmClassName: 'bg-black hover:bg-zinc-900',
+      confirmClassName: 'bg-indigo-600 hover:bg-indigo-700',
       confirmTextClassName: 'text-white',
     };
   }, [tone]);

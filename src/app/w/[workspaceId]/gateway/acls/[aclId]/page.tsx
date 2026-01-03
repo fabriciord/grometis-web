@@ -59,7 +59,7 @@ export default function AclViewPage() {
           </Link>
           <Link
             href={`/w/${params.workspaceId}/gateway/acls/${params.aclId}/edit`}
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
             Edit
           </Link>

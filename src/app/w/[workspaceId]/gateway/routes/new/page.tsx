@@ -8,6 +8,8 @@ import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { HelpHint } from '@/app/_components/HelpHint';
 
+type WorkspaceAvatar = { color: string | null; imageDataUrl: string | null };
+
 type ServiceListItem = {
   id: string;
   name: string;
@@ -16,6 +18,12 @@ type ServiceListItem = {
 type PathItem = {
   id: string;
   value: string;
+};
+type WorkspaceListItem = {
+  id: string;
+  name: string;
+  role: 'viewer' | 'admin' | 'owner';
+  avatar?: WorkspaceAvatar;
 };
 
 function splitList(value: string): string[] {
@@ -36,7 +44,7 @@ export default function NewRoutePage() {
   const [description, setDescription] = useState('');
   const nextPathIdRef = useRef(1);
   const [paths, setPaths] = useState<PathItem[]>([]);
-  const [methods, setMethods] = useState('GET,POST');
+  const [methods, setMethods] = useState('');
   const [protocols, setProtocols] = useState('http,https');
   const [host, setHost] = useState('');
   const [stripPath, setStripPath] = useState<boolean>(true);
@@ -62,8 +70,21 @@ export default function NewRoutePage() {
     },
     enabled: !!token,
   });
+    const workspacesQuery = useQuery({
+      queryKey: ['workspaces'],
+      queryFn: async () => {
+        const res = await apiFetch<{ workspaces: WorkspaceListItem[] }>('/workspaces', {
+          token,
+        });
+        return res.workspaces;
+      },
+      enabled: !!token,
+    });
 
-  const serviceIdFromQuery = searchParams.get('serviceId') ?? '';
+  const workspaceName =
+    workspacesQuery.data?.find((w) => w.id === params.workspaceId)?.name ?? params.workspaceId;
+  
+    const serviceIdFromQuery = searchParams.get('serviceId') ?? '';
   const queryServiceIdIsValid = (servicesQuery.data ?? []).some((s) => s.id === serviceIdFromQuery);
 
   const selectedServiceId =
@@ -174,7 +195,7 @@ export default function NewRoutePage() {
                           ),
                         );
                       }}
-                      placeholder="/v1/users"
+                      placeholder={`/${workspaceName}/v1/users`}
                       autoComplete="off"
                       spellCheck={false}
                     />
@@ -289,7 +310,7 @@ export default function NewRoutePage() {
           </label>
 
           <button
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 sm:col-span-2"
             disabled={
               createRouteMutation.isPending ||
               servicesQuery.isLoading ||

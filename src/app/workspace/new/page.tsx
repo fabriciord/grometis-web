@@ -119,7 +119,7 @@ export default function CreateWorkspacePage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-10">
-        <div className="text-sm text-blue-600">
+        <div className="text-sm text-indigo-600">
           <Link href="/workspace" className="hover:underline">
             Workspaces
           </Link>{' '}
@@ -161,7 +161,7 @@ export default function CreateWorkspacePage() {
                     key={c.id}
                     type="button"
                     className={`relative h-10 w-10 rounded-md ${c.swatchClass} ${
-                      selected ? 'ring-2 ring-blue-600 ring-offset-2 ring-offset-zinc-50' : ''
+                      selected ? 'ring-2 ring-indigo-600 ring-offset-2 ring-offset-zinc-50' : ''
                     }`}
                     onClick={() => {
                       setAvatarColor(c.id);
@@ -216,7 +216,7 @@ export default function CreateWorkspacePage() {
                 {avatarImageName ? avatarImageName : 'No File Chosen'}
               </div>
 
-              <label className="cursor-pointer text-sm font-medium text-blue-600 hover:underline">
+              <label className="cursor-pointer text-sm font-medium text-indigo-600 hover:underline">
                 Upload Image
                 <input
                   ref={fileInputRef}

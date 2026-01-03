@@ -182,7 +182,7 @@ export default function ConsumerViewPage() {
           </Link>
           <Link
             href={`/w/${params.workspaceId}/gateway/consumers/${params.consumerId}/edit`}
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
             Edit
           </Link>
@@ -241,7 +241,7 @@ export default function ConsumerViewPage() {
                 href={`/w/${params.workspaceId}/gateway/acls/new?consumerId=${encodeURIComponent(
                   params.consumerId,
                 )}`}
-                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+                className="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
               >
                 New ACL
               </Link>
@@ -256,7 +256,7 @@ export default function ConsumerViewPage() {
                       ? 'Failed to load workspace plugins.'
                       : 'Install the ACL plugin on a route, service, consumer, or as global in this workspace to enable ACLs.'
                 }
-                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 New ACL
               </button>
@@ -295,7 +295,7 @@ export default function ConsumerViewPage() {
                           </Link>
                           <Link
                             href={`/w/${params.workspaceId}/gateway/acls/${a.id}/edit`}
-                            className="rounded-md bg-black px-2 py-1 text-sm text-white"
+                            className="rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700"
                           >
                             Edit
                           </Link>
@@ -324,7 +324,7 @@ export default function ConsumerViewPage() {
                 href={`/w/${params.workspaceId}/gateway/keyauth-consumers/new?consumerId=${encodeURIComponent(
                   params.consumerId,
                 )}`}
-                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+                className="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
               >
                 New KeyAuth
               </Link>
@@ -341,7 +341,7 @@ export default function ConsumerViewPage() {
                         ? 'The KeyAuth plugin is enabled, but is not installed on a route or service. Install it on a route or service (or set it as global) to enable KeyAuth.'
                         : 'Install the KeyAuth plugin on a route, service, or as global to enable KeyAuth.'
                 }
-                className="shrink-0 rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 New KeyAuth
               </button>
@@ -382,7 +382,7 @@ export default function ConsumerViewPage() {
                           </Link>
                           <Link
                             href={`/w/${params.workspaceId}/gateway/keyauth-consumers/${k.id}/edit`}
-                            className="rounded-md bg-black px-2 py-1 text-sm text-white"
+                            className="rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700"
                           >
                             Edit
                           </Link>

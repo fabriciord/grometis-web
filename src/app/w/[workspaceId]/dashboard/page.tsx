@@ -379,7 +379,7 @@ export default function WorkspaceDashboardPage() {
       />
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold text-zinc-900">{workspaceName} Workspace</h1>
+          <h1 className="text-3xl font-semibold text-zinc-900">{workspaceName}</h1>
         </div>
 
         <div className="flex flex-col items-end gap-2">
@@ -497,7 +497,7 @@ export default function WorkspaceDashboardPage() {
 
             <div className="mt-3 flex items-center gap-4 text-xs text-zinc-600">
               <div className="flex items-center gap-2">
-                <span className="inline-block h-2 w-2 rounded-sm bg-blue-500" />
+                <span className="inline-block h-2 w-2 rounded-sm bg-indigo-500" />
                 Success
               </div>
               <div className="flex items-center gap-2">
@@ -513,7 +513,7 @@ export default function WorkspaceDashboardPage() {
         <div className="rounded-xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="text-sm font-medium text-zinc-900">Services</div>
-            <Link className="text-sm text-blue-600 hover:underline" href={`/w/${params.workspaceId}/gateway/services`}>
+            <Link className="text-sm text-indigo-600 hover:underline" href={`/w/${params.workspaceId}/gateway/services`}>
               VIEW ALL
             </Link>
           </div>
@@ -535,7 +535,7 @@ export default function WorkspaceDashboardPage() {
                 </div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/services/${s.id}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-indigo-600 hover:underline"
                 >
                   View
                 </Link>
@@ -547,7 +547,7 @@ export default function WorkspaceDashboardPage() {
         <div className="rounded-xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="text-sm font-medium text-zinc-900">Consumers</div>
-            <Link className="text-sm text-blue-600 hover:underline" href={`/w/${params.workspaceId}/gateway/consumers`}>
+            <Link className="text-sm text-indigo-600 hover:underline" href={`/w/${params.workspaceId}/gateway/consumers`}>
               VIEW ALL
             </Link>
           </div>
@@ -569,7 +569,7 @@ export default function WorkspaceDashboardPage() {
                 </div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/consumers/${c.id}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-indigo-600 hover:underline"
                 >
                   View
                 </Link>
@@ -583,7 +583,7 @@ export default function WorkspaceDashboardPage() {
         <div className="rounded-xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="text-sm font-medium text-zinc-900">Latest Installed Plugins</div>
-            <Link className="text-sm text-blue-600 hover:underline" href={`/w/${params.workspaceId}/gateway/plugins`}>
+            <Link className="text-sm text-indigo-600 hover:underline" href={`/w/${params.workspaceId}/gateway/plugins`}>
               VIEW ALL
             </Link>
           </div>
@@ -607,7 +607,7 @@ export default function WorkspaceDashboardPage() {
                 <div className="text-right">
                   <Link
                     href={`/w/${params.workspaceId}/gateway/plugins/${p.id}/edit`}
-                    className="text-sm text-blue-600 hover:underline"
+                    className="text-sm text-indigo-600 hover:underline"
                   >
                     Edit Settings
                   </Link>

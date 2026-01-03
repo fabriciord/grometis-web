@@ -237,7 +237,7 @@ export default function KeyauthNewPage() {
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
                     href={`/w/${params.workspaceId}/gateway/plugins/new`}
-                    className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                   >
                     Install plugin
                   </Link>
@@ -251,7 +251,7 @@ export default function KeyauthNewPage() {
               </div>
             ) : null}
             <button
-              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
               type="submit"
               disabled={createMutation.isPending || !!keyauthBlockedReason}
               title={keyauthBlockedReason ?? undefined}

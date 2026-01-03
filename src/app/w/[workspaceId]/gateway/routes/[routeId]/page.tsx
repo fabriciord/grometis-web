@@ -75,8 +75,8 @@ function statusClass(statusCode: number) {
   if (statusCode >= 200 && statusCode < 300) return 'bg-blue-500';
   if (statusCode >= 300 && statusCode < 400) return 'bg-blue-500';
   if (statusCode >= 400 && statusCode < 500) return 'bg-red-500';
-  if (statusCode >= 500 && statusCode < 600) return 'bg-red-500';
-  return 'bg-zinc-400';
+    if (statusCode >= 200 && statusCode < 300) return 'bg-indigo-500';
+    if (statusCode >= 300 && statusCode < 400) return 'bg-indigo-500';
 }
 
 type RouteDetails = {
@@ -236,7 +236,7 @@ export default function RouteViewPage() {
             </Link>
             <Link
               href={`/w/${params.workspaceId}/gateway/routes/${params.routeId}/edit`}
-              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Edit Route
             </Link>
@@ -313,7 +313,7 @@ export default function RouteViewPage() {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="text-sm font-medium text-zinc-900">Plugins</div>
           <Link
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-indigo-600 hover:underline"
             href={`/w/${params.workspaceId}/gateway/plugins/new?routeId=${params.routeId}`}
           >
             Add Plugin

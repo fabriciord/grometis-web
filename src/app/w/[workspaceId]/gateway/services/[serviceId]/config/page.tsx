@@ -82,7 +82,7 @@ export default function ServiceConfigPage() {
           <div className="flex items-center gap-2">
             <Link
               href={`/w/${params.workspaceId}/gateway/services/${params.serviceId}/edit`}
-              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Edit Service
             </Link>

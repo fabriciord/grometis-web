@@ -97,8 +97,8 @@ function statusClass(statusCode: number) {
   if (statusCode >= 200 && statusCode < 300) return 'bg-blue-500';
   if (statusCode >= 300 && statusCode < 400) return 'bg-blue-500';
   if (statusCode >= 400 && statusCode < 500) return 'bg-red-500';
-  if (statusCode >= 500 && statusCode < 600) return 'bg-red-500';
-  return 'bg-zinc-400';
+    if (statusCode >= 200 && statusCode < 300) return 'bg-indigo-500';
+    if (statusCode >= 300 && statusCode < 400) return 'bg-indigo-500';
 }
 
 function serviceEnabledBadge(enabled: boolean) {
@@ -252,7 +252,7 @@ export default function ServiceViewPage() {
             </Link>
             <Link
               href={`/w/${params.workspaceId}/gateway/services/${params.serviceId}/edit`}
-              className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Edit Service
             </Link>
@@ -338,7 +338,7 @@ export default function ServiceViewPage() {
               </div>
             </div>
             <Link
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-indigo-600 hover:underline"
               href={`/w/${params.workspaceId}/gateway/routes/new?serviceId=${params.serviceId}`}
             >
               Add Route
@@ -359,7 +359,7 @@ export default function ServiceViewPage() {
                 <div className="mt-1 text-sm text-zinc-600">Create your first route to start routing traffic.</div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/routes/new?serviceId=${params.serviceId}`}
-                  className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="mt-3 inline-flex rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                 >
                   Add Route
                 </Link>
@@ -394,7 +394,7 @@ export default function ServiceViewPage() {
               </div>
             </div>
             <Link
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-indigo-600 hover:underline"
               href={`/w/${params.workspaceId}/gateway/plugins/new?serviceId=${params.serviceId}`}
             >
               Add Plugin
@@ -412,7 +412,7 @@ export default function ServiceViewPage() {
                 <div className="mt-1 text-sm text-zinc-600">Add plugins to apply policies and transformations.</div>
                 <Link
                   href={`/w/${params.workspaceId}/gateway/plugins/new?serviceId=${params.serviceId}`}
-                  className="mt-3 inline-flex rounded-md bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="mt-3 inline-flex rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                 >
                   Add Plugin
                 </Link>

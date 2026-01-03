@@ -8,6 +8,15 @@ import { apiFetch } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { HelpHint } from '@/app/_components/HelpHint';
 
+type WorkspaceAvatar = { color: string | null; imageDataUrl: string | null };
+
+type WorkspaceListItem = {
+  id: string;
+  name: string;
+  role: 'viewer' | 'admin' | 'owner';
+  avatar?: WorkspaceAvatar;
+};
+
 type ServiceListItem = { id: string; name: string };
 
 type PathItem = {
@@ -87,6 +96,18 @@ export default function RouteEditPage() {
     enabled: !!token,
   });
 
+  const workspacesQuery = useQuery({
+    queryKey: ['workspaces'],
+    queryFn: async () => {
+      const res = await apiFetch<{ workspaces: WorkspaceListItem[] }>('/workspaces', { token });
+      return res.workspaces;
+    },
+    enabled: !!token,
+  });
+
+  const workspaceName =
+    workspacesQuery.data?.find((w) => w.id === params.workspaceId)?.name ?? params.workspaceId;
+
   const route = routeQuery.data;
 
   function applyRouteToForm(r: RouteDetails) {
@@ -159,7 +180,7 @@ export default function RouteEditPage() {
             Cancel
           </Link>
           <button
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
             disabled={updateMutation.isPending || routeQuery.isLoading || servicesQuery.isLoading}
             form="edit-route-form"
             type="submit"
@@ -246,7 +267,7 @@ export default function RouteEditPage() {
                             ),
                           );
                         }}
-                        placeholder="/v1/users"
+                        placeholder={`/${workspaceName}/v1/users`}
                         autoComplete="off"
                         spellCheck={false}
                       />

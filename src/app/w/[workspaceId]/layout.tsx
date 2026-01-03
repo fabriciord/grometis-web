@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -75,21 +76,23 @@ export default function WorkspaceLayout({
           <div>
             <Link
               href={`/w/${workspaceId}/dashboard`}
-              className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-900/60"
+              className="group flex w-full items-center justify-center rounded-lg px-2 py-2 hover:bg-zinc-900/60"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white">
-                G
-              </div>
-
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-white">GrOMEtiS</div>
-                <div className="truncate text-xs text-zinc-400">Gateway control plane</div>
+              <div className="rounded-md bg-white px-2 py-1">
+                <Image
+                  src="/brand/gateway_grometis.png"
+                  alt="GrOMEtiS"
+                  width={160}
+                  height={48}
+                  className="h-10 w-auto object-contain"
+                  priority
+                />
               </div>
             </Link>
 
             <Link
               href="/workspace"
-              className="mt-3 inline-flex rounded-md px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-zinc-900/60 hover:text-white"
+              className="mt-3 inline-flex rounded-md border border-indigo-500/30 bg-indigo-600/10 px-2 py-1 text-xs font-medium text-indigo-100 hover:bg-indigo-600/20"
             >
               Trocar workspace
             </Link>
@@ -118,7 +121,7 @@ export default function WorkspaceLayout({
                   href={item.href}
                   className={`block rounded-md px-3 py-2 text-sm ${
                     active
-                      ? 'bg-zinc-900 text-white'
+                      ? 'bg-indigo-600/20 text-white'
                       : 'text-zinc-200 hover:bg-zinc-900/60 hover:text-white'
                   }`}
                 >
@@ -130,7 +133,7 @@ export default function WorkspaceLayout({
 
           <div className="mt-auto pt-6">
             <button
-              className="mt-2 w-full rounded-md bg-white px-3 py-2 text-left text-sm font-medium text-zinc-900 hover:bg-zinc-100"
+              className="mt-2 w-full rounded-md bg-indigo-600 px-3 py-2 text-left text-sm font-medium text-white hover:bg-indigo-700"
               onClick={() => {
                 clearAccessToken();
                 router.push('/login');
@@ -149,7 +152,7 @@ export default function WorkspaceLayout({
                 <button
                   type="button"
                   aria-label={sidebarOpen ? 'Fechar menu' : 'Abrir menu'}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
                   onClick={() => setSidebarOpen((v) => !v)}
                 >
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
@@ -161,7 +164,6 @@ export default function WorkspaceLayout({
                     />
                   </svg>
                 </button>
-
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-zinc-900">{workspaceName}</div>
                   <div className="text-xs text-zinc-500">Control plane</div>

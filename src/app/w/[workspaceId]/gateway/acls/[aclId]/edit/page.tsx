@@ -195,7 +195,7 @@ export default function AclEditPage() {
 
             <div className="sm:col-span-2 flex items-center gap-3">
               <button
-                className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
                 type="submit"
                 disabled={updateMutation.isPending}
               >

@@ -139,14 +139,31 @@ function avatarBgClass(color: string | null | undefined): string {
   }
 }
 
+function safeParseJwtRole(token: string | null): string | null {
+  if (!token) return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  try {
+    const payload = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const padded = payload.padEnd(payload.length + ((4 - (payload.length % 4)) % 4), '=');
+    const json = atob(padded);
+    const obj = JSON.parse(json) as { role?: unknown };
+    return typeof obj.role === 'string' ? obj.role : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function SelectWorkspacePage() {
   const router = useRouter();
   const token = useMemo(() => getAccessToken(), []);
+  const isAdmin = useMemo(() => safeParseJwtRole(token) === 'admin', [token]);
   const [timeframe, setTimeframe] = useState<Timeframe>('12h');
   const [showUtc, setShowUtc] = useState(false);
   const [filter, setFilter] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showBrandLogo, setShowBrandLogo] = useState(true);
 
   useEffect(() => {
     if (!token) router.replace('/login');
@@ -312,39 +329,31 @@ export default function SelectWorkspacePage() {
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-3">
-            {showBrandLogo ? (
-              <Image
-                src="/brand/grometis-logo.png"
-                alt="GrOMEtiS"
-                width={32}
-                height={32}
-                className="h-8 w-8 rounded-md border border-zinc-200 bg-white object-contain"
-                onError={() => setShowBrandLogo(false)}
-              />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 text-xs font-semibold text-zinc-700">
-                G
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold text-zinc-900">GrOMEtiS</div>
-              <div className="h-4 w-px bg-zinc-200" />
-              <div className="text-sm text-zinc-700">Workspaces</div>
-            </div>
+          <div className="flex items-center">
+            <div className="text-sm font-semibold text-zinc-900">Workspaces</div>
           </div>
 
-          <button
-            type="button"
-            className="rounded-md px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900"
-            onClick={() => {
-              clearAccessToken();
-              router.push('/login');
-            }}
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            {isAdmin ? (
+              <Link
+                href="/admin/users"
+                className="rounded-md border border-indigo-200 bg-white px-3 py-2 text-sm text-indigo-700 hover:bg-indigo-50"
+              >
+                Admin
+              </Link>
+            ) : null}
+
+            <button
+              type="button"
+              className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+              onClick={() => {
+                clearAccessToken();
+                router.push('/login');
+              }}
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -432,9 +441,9 @@ export default function SelectWorkspacePage() {
           {!workspacesQuery.isLoading && !workspacesQuery.isError && !isLoadingActivities && !isErrorActivities ? (
             <div className="w-full overflow-x-auto">
               <svg width={chart.width} height={chart.height} viewBox={`0 0 ${chart.width} ${chart.height}`}>
-                <path d={chart.areaSuccess} fill="rgba(59,130,246,0.25)" />
+                <path d={chart.areaSuccess} fill="rgba(99,102,241,0.25)" />
                 <path d={chart.areaError} fill="rgba(239,68,68,0.22)" />
-                <path d={chart.lineSuccess} fill="none" stroke="rgba(59,130,246,0.9)" strokeWidth={1.5} />
+                <path d={chart.lineSuccess} fill="none" stroke="rgba(99,102,241,0.9)" strokeWidth={1.5} />
                 <path d={chart.lineError} fill="none" stroke="rgba(239,68,68,0.9)" strokeWidth={1.2} />
               </svg>
               <div className="mt-3 text-xs text-zinc-500">
@@ -548,7 +557,7 @@ export default function SelectWorkspacePage() {
                 </div>
 
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="text-xs text-blue-600">
+                  <div className="text-xs text-indigo-600">
                     {totals.totalRequests.toLocaleString()} Requests
                   </div>
                   <div className="text-xs text-red-600">{totals.avgErrorRate.toFixed(2)}% Error Rate</div>
@@ -556,9 +565,9 @@ export default function SelectWorkspacePage() {
 
                 <div className="mt-3 w-full overflow-hidden rounded-md border border-zinc-200 bg-white">
                   <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-                    <path d={areaSuccess} fill="rgba(59,130,246,0.22)" />
+                    <path d={areaSuccess} fill="rgba(99,102,241,0.22)" />
                     <path d={areaError} fill="rgba(239,68,68,0.18)" />
-                    <path d={lineSuccess} fill="none" stroke="rgba(59,130,246,0.85)" strokeWidth={1.2} />
+                    <path d={lineSuccess} fill="none" stroke="rgba(99,102,241,0.85)" strokeWidth={1.2} />
                     <path d={lineError} fill="none" stroke="rgba(239,68,68,0.85)" strokeWidth={1} />
                   </svg>
                 </div>

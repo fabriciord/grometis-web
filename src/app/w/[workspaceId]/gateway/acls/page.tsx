@@ -85,7 +85,7 @@ export default function AclsPage() {
         {canCreateAcl ? (
           <Link
             href={`/w/${params.workspaceId}/gateway/acls/new`}
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
             New ACL
           </Link>
@@ -100,7 +100,7 @@ export default function AclsPage() {
                   ? 'Failed to load workspace plugins.'
                   : 'Install the ACL plugin on a route, service, consumer, or as global in this workspace to enable ACLs.'
             }
-            className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             New ACL
           </button>
