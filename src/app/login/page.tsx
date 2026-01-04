@@ -3,9 +3,9 @@
 import { useMutation } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { setAccessToken } from '@/lib/auth';
+import { clearAccessToken, getAccessToken, isAccessTokenExpired, setAccessToken } from '@/lib/auth';
 
 type LoginResponse = {
   accessToken: string;
@@ -17,6 +17,23 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showBrandLogo, setShowBrandLogo] = useState(true);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      setCheckingSession(false);
+      return;
+    }
+
+    if (isAccessTokenExpired(token)) {
+      clearAccessToken();
+      setCheckingSession(false);
+      return;
+    }
+
+    router.replace('/workspace');
+  }, [router]);
 
   const loginMutation = useMutation({
     mutationFn: async () => {
@@ -30,6 +47,16 @@ export default function LoginPage() {
       router.push('/workspace');
     },
   });
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-zinc-50 px-6">
+        <div className="mx-auto flex min-h-screen w-full max-w-7xl items-center justify-center py-10">
+          <div className="text-sm text-zinc-600">Loading…</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 px-6">

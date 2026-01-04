@@ -52,6 +52,8 @@ export default function WorkspaceLayout({
   const workspaceName =
     workspacesQuery.data?.find((w) => w.id === workspaceId)?.name ?? workspaceId;
 
+  const workspaces = workspacesQuery.data ?? [];
+
   const nav = [
     { label: 'Overview', href: `/w/${workspaceId}/dashboard` },
     { section: 'Gateway' as const },
@@ -89,12 +91,32 @@ export default function WorkspaceLayout({
               </div>
             </Link>
 
-            <Link
-              href="/workspace"
-              className="mt-3 inline-flex rounded-md border border-indigo-400/25 bg-indigo-600/10 px-2 py-1 text-xs font-medium text-indigo-100 hover:bg-indigo-600/20"
-            >
-              Trocar workspace
-            </Link>
+            <div className="mt-3">
+              <label className="text-xs font-medium text-zinc-400">Workspace</label>
+              <select
+                className="mt-1 w-full rounded-md border border-indigo-400/25 bg-indigo-950 px-2 py-2 text-sm text-zinc-100 outline-none focus:border-indigo-400"
+                value={workspaceId}
+                disabled={workspacesQuery.isLoading || workspacesQuery.isError || workspaces.length === 0}
+                onChange={(e) => {
+                  const nextId = e.target.value;
+                  if (!nextId || nextId === workspaceId) return;
+
+                  const prefix = `/w/${workspaceId}`;
+                  const nextPrefix = `/w/${nextId}`;
+                  const nextPath = pathname.startsWith(prefix)
+                    ? `${nextPrefix}${pathname.slice(prefix.length)}`
+                    : `${nextPrefix}/dashboard`;
+
+                  router.push(nextPath);
+                }}
+              >
+                {workspaces.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="mt-3 truncate text-sm font-medium text-zinc-100">{workspaceName}</div>
             <div className="mt-1 text-xs text-zinc-500">Workspace</div>
           </div>
